@@ -1,0 +1,140 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "add_scene_node",
+      "description": "Add or update a node (object, room, surface, region, or agent) in the scenemem scene graph. Use this when you observe a new entity in the environment.",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Human-readable identifier for the node, e.g. 'door-1', 'table-A', 'room-kitchen'."
+          },
+          "node_type": {
+            "type": "string",
+            "enum": ["object", "room", "surface", "region", "agent"],
+            "description": "Category of the scene element."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Key-value pairs describing the node, e.g. {\"color\": \"brown\", \"state\": \"open\"}.",
+            "additionalProperties": true
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Observation confidence in [0.0, 1.0]. Defaults to 1.0.",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the agent that observed this node."
+          },
+          "db": {
+            "type": "string",
+            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+          }
+        },
+        "required": ["label", "node_type"],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "query_nodes",
+      "description": "Query nodes in the scenemem scene graph by type, label substring, or minimum confidence. Use this to find objects, rooms, or surfaces in the environment.",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "node_type": {
+            "type": "string",
+            "description": "Filter by node type: object, room, surface, region, or agent.",
+            "enum": ["object", "room", "surface", "region", "agent"]
+          },
+          "label_contains": {
+            "type": "string",
+            "description": "Case-insensitive substring to match against node labels."
+          },
+          "min_confidence": {
+            "type": "number",
+            "description": "Minimum confidence threshold in [0.0, 1.0].",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "db": {
+            "type": "string",
+            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_scene_context",
+      "description": "Get a human-readable text summary of the current scene graph. Returns counts by type, known object labels, and edge count. Use this to give an LLM situational awareness about the environment.",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "description": "If provided, only include nodes observed by this agent."
+          },
+          "db": {
+            "type": "string",
+            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "add_scene_edge",
+      "description": "Add a directed spatial relationship (edge) between two nodes. Use this to record that one entity contains, is adjacent to, or is on top of another.",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "description": "ID of the source node (16-char hex content-addressed ID)."
+          },
+          "target_id": {
+            "type": "string",
+            "description": "ID of the target node (16-char hex content-addressed ID)."
+          },
+          "relation": {
+            "type": "string",
+            "enum": ["contains", "adjacent-to", "on-top-of", "blocks", "connects"],
+            "description": "The spatial relationship from source to target."
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Observation confidence in [0.0, 1.0].",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "db": {
+            "type": "string",
+            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+          }
+        },
+        "required": ["source_id", "target_id", "relation"],
+        "additionalProperties": false
+      }
+    }
+  }
+]

@@ -1,0 +1,28 @@
+name: scenemem
+description: "CRDT scene graph status check for embodied AI agents"
+inputs:
+  db:
+    description: "Path to the scenemem scene database"
+    required: false
+    default: ".scenemem/scene.db"
+  fail-on-empty:
+    description: "Fail if the scene graph is empty (no nodes)"
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: Install scenemem
+      shell: bash
+      run: pip install -e "${{ github.action_path }}"
+    - name: Check scene graph status
+      shell: bash
+      run: |
+        scenemem --db "${{ inputs.db }}" status
+        if [ "${{ inputs.fail-on-empty }}" = "true" ]; then
+          NODE_COUNT=$(scenemem --db "${{ inputs.db }}" status | grep -oP '\d+(?= node)' | head -1)
+          if [ "${NODE_COUNT:-0}" -eq 0 ]; then
+            echo "Scene graph is empty — failing as requested."
+            exit 1
+          fi
+        fi
