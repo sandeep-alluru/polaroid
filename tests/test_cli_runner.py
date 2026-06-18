@@ -7,7 +7,7 @@ import json
 import pytest
 from click.testing import CliRunner
 
-from scenemem.cli import main
+from polaroid.cli import main
 
 
 @pytest.fixture
@@ -95,8 +95,8 @@ def test_add_node_stores_in_db(db):
 
 
 def test_add_edge_basic(db):
-    from scenemem.graph import SceneNode
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.store import SceneStore
 
     # Pre-populate nodes
     with SceneStore(db) as store:
@@ -170,8 +170,8 @@ def test_status_with_data(db):
 
 
 def test_merge_command(tmp_path):
-    from scenemem.graph import SceneNode
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.store import SceneStore
 
     local_db = str(tmp_path / "local.db")
     remote_db = str(tmp_path / "remote.db")

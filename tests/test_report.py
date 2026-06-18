@@ -7,8 +7,8 @@ import json
 
 from rich.console import Console
 
-from scenemem.graph import MergeResult, SceneEdge, SceneNode
-from scenemem.report import print_merge, print_scene, to_json, to_markdown
+from polaroid.graph import MergeResult, SceneEdge, SceneNode
+from polaroid.report import print_merge, print_scene, to_json, to_markdown
 
 # ── print_scene ───────────────────────────────────────────────────────────────
 
@@ -111,7 +111,7 @@ def test_to_json_without_edges_no_edge_key():
 
 def test_to_markdown_empty():
     md = to_markdown([])
-    assert "scenemem" in md
+    assert "polaroid" in md
     assert "No nodes" in md or "no nodes" in md.lower()
 
 
@@ -137,4 +137,4 @@ def test_to_markdown_truncates_at_50():
 def test_to_markdown_contains_branding():
     nodes = [SceneNode(label="x", node_type="object", properties={})]
     md = to_markdown(nodes)
-    assert "scenemem" in md
+    assert "polaroid" in md

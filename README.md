@@ -1,15 +1,15 @@
-# scenemem
+# polaroid
 
 **Embeddable CRDT scene graph for embodied AI agents.**
 
-![scenemem](assets/hero.png)
+![polaroid](assets/hero.png)
 
-[![CI](https://github.com/sandeep-alluru/scenemem/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeep-alluru/scenemem/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/scenemem.svg)](https://pypi.org/project/scenemem/)
-[![Python 3.10+](https://img.shields.io/pypi/pyversions/scenemem.svg)](https://pypi.org/project/scenemem/)
-[![Downloads](https://img.shields.io/pypi/dm/scenemem.svg)](https://pypi.org/project/scenemem/)
+[![CI](https://github.com/sandeep-alluru/polaroid/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeep-alluru/polaroid/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/polaroid.svg)](https://pypi.org/project/polaroid/)
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/polaroid.svg)](https://pypi.org/project/polaroid/)
+[![Downloads](https://img.shields.io/pypi/dm/polaroid.svg)](https://pypi.org/project/polaroid/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/sandeep-alluru/scenemem/branch/main/graph/badge.svg)](https://codecov.io/gh/sandeep-alluru/scenemem)
+[![codecov](https://codecov.io/gh/sandeep-alluru/polaroid/branch/main/graph/badge.svg)](https://codecov.io/gh/sandeep-alluru/polaroid)
 [![Typed](https://img.shields.io/badge/types-mypy-blue)](https://mypy-lang.org/)
 
 [Quick Start](#quick-start) · [How It Works](#how-it-works) · [CLI Reference](#cli-reference) · [GitHub Action](#github-action) · [vs. Alternatives](#vs-alternatives) · [Contributing](CONTRIBUTING.md)
@@ -20,11 +20,11 @@
 
 Multiple robots navigating the same building each build their own private map. When robot A opens a door and robot B hasn't been told, they diverge. Sharing a map requires a central server — which is a single point of failure.
 
-scenemem solves this with a **CRDT scene graph**: a persistent, mergeable map of nodes (objects, rooms, surfaces) and edges (spatial relationships). Two robots can merge their maps without a server, without conflicts, without data loss. CRDT semantics guarantee the merge is always safe, deterministic, and idempotent.
+polaroid solves this with a **CRDT scene graph**: a persistent, mergeable map of nodes (objects, rooms, surfaces) and edges (spatial relationships). Two robots can merge their maps without a server, without conflicts, without data loss. CRDT semantics guarantee the merge is always safe, deterministic, and idempotent.
 
 ```bash
 # Share your scene graph with a peer
-scenemem merge /path/to/peer/scene.db
+polaroid merge /path/to/peer/scene.db
 ```
 
 ---
@@ -70,11 +70,11 @@ flowchart LR
 ## Quick Start
 
 ```bash
-pip install scenemem
+pip install polaroid
 ```
 
 ```python
-from scenemem import SceneNode, SceneEdge, SceneMerger, SceneQuery, SceneStore
+from polaroid import SceneNode, SceneEdge, SceneMerger, SceneQuery, SceneStore
 
 # Robot A observes a kitchen
 store_a = SceneStore("/tmp/robot-a.db")
@@ -111,7 +111,7 @@ store_b.close()
 ## CLI Reference
 
 ```bash
-scenemem [--db PATH] COMMAND [OPTIONS]
+polaroid [--db PATH] COMMAND [OPTIONS]
 ```
 
 | Command | Description | Key options |
@@ -126,38 +126,38 @@ scenemem [--db PATH] COMMAND [OPTIONS]
 
 | Option | Default | Env var |
 |--------|---------|---------|
-| `--db PATH` | `.scenemem/scene.db` | `SCENEMEM_DB` |
+| `--db PATH` | `.polaroid/scene.db` | `POLAROID_DB` |
 
 **Examples:**
 
 ```bash
 # Add nodes
-scenemem add-node door-1 object --confidence 0.95 --property state=open --property color=brown
-scenemem add-node room-kitchen room
+polaroid add-node door-1 object --confidence 0.95 --property state=open --property color=brown
+polaroid add-node room-kitchen room
 
 # Add an edge
-scenemem add-edge <door-id> <kitchen-id> contains
+polaroid add-edge <door-id> <kitchen-id> contains
 
 # Query the scene
-scenemem query --type object
-scenemem query --label door --min-confidence 0.8 --format json
+polaroid query --type object
+polaroid query --label door --min-confidence 0.8 --format json
 
 # Merge peer's scene
-scenemem merge /path/to/peer.db
+polaroid merge /path/to/peer.db
 
 # Status overview
-scenemem status
+polaroid status
 ```
 
 ---
 
 ## GitHub Action
 
-Add scenemem scene merge to your CI pipeline:
+Add polaroid scene merge to your CI pipeline:
 
 ```yaml
-# .github/workflows/scenemem.yml
-name: scenemem scene check
+# .github/workflows/polaroid.yml
+name: polaroid scene check
 on: [push, pull_request]
 
 jobs:
@@ -165,19 +165,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: sandeep-alluru/scenemem@main
+      - uses: sandeep-alluru/polaroid@main
         with:
-          db: .scenemem/scene.db
+          db: .polaroid/scene.db
           fail-on-empty: "false"
 ```
 
-The action installs scenemem and runs `scenemem status`. See [docs/github-action.md](docs/github-action.md) for full documentation.
+The action installs polaroid and runs `polaroid status`. See [docs/github-action.md](docs/github-action.md) for full documentation.
 
 ---
 
 ## vs. Alternatives
 
-| | scenemem | ROS 2 map server | Semantic Fusion | Hydra (Facebook) | LangGraph checkpointing |
+| | polaroid | ROS 2 map server | Semantic Fusion | Hydra (Facebook) | LangGraph checkpointing |
 |---|---|---|---|---|---|
 | **CRDT merge** | Yes — grow-only + confidence LWW | No | No | No | No |
 | **Serverless** | Yes — single SQLite file | Requires ROS master | Requires GPU | Requires server | Partial |
@@ -187,24 +187,24 @@ The action installs scenemem and runs `scenemem status`. See [docs/github-action
 | **Primary purpose** | CRDT scene graph for multi-agent | ROS navigation maps | Dense 3D fusion | Neural scene representation | LLM state persistence |
 | **Open source** | MIT | Apache 2.0 | Research | BSD | Apache 2.0 |
 
-scenemem is not a 3D reconstruction system. It is designed for: *"Given that multiple agents observed different parts of the world, how do we merge their maps safely?"*
+polaroid is not a 3D reconstruction system. It is designed for: *"Given that multiple agents observed different parts of the world, how do we merge their maps safely?"*
 
 ---
 
 ## Claude / MCP integration
 
-scenemem ships a Model Context Protocol server that lets Claude and other MCP-compatible agents record and query scene nodes directly:
+polaroid ships a Model Context Protocol server that lets Claude and other MCP-compatible agents record and query scene nodes directly:
 
 ```bash
 # Start the MCP server
-python -m scenemem.mcp_server
+python -m polaroid.mcp_server
 
 # In your Claude Code project's .claude/settings.json:
 {
   "mcpServers": {
-    "scenemem": {
+    "polaroid": {
       "command": "python",
-      "args": ["-m", "scenemem.mcp_server"]
+      "args": ["-m", "polaroid.mcp_server"]
     }
   }
 }
@@ -216,11 +216,11 @@ Once connected, Claude can call `add_scene_node`, `query_nodes`, and `get_contex
 
 ## OpenAI integration
 
-scenemem exposes a FastAPI REST server compatible with OpenAI's function-calling format. The tool definitions are in [`tools/openai-tools.json`](tools/openai-tools.json) and the full API spec is in [`openapi.yaml`](openapi.yaml).
+polaroid exposes a FastAPI REST server compatible with OpenAI's function-calling format. The tool definitions are in [`tools/openai-tools.json`](tools/openai-tools.json) and the full API spec is in [`openapi.yaml`](openapi.yaml).
 
 ```bash
 # Start the REST server
-uvicorn scenemem.api:app --reload
+uvicorn polaroid.api:app --reload
 
 # Pass to Codex CLI or any OpenAI-compatible agent
 codex --tools tools/openai-tools.json "Show me all objects in the scene"
@@ -233,9 +233,9 @@ Endpoints: `GET /health`, `POST /node`, `POST /edge`, `GET /nodes`, `POST /merge
 ## Repository structure
 
 ```
-scenemem/
+polaroid/
 ├── src/
-│   └── scenemem/
+│   └── polaroid/
 │       ├── graph.py          # SceneNode, SceneEdge, MergeResult dataclasses
 │       ├── store.py          # SQLite-backed SceneStore
 │       ├── merger.py         # SceneMerger CRDT merge algorithm
@@ -276,4 +276,4 @@ Suggested topics for discoverability:
 
 ---
 
-[![Star History Chart](https://api.star-history.com/svg?repos=sandeep-alluru/scenemem&type=Date)](https://star-history.com/#sandeep-alluru/scenemem&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=sandeep-alluru/polaroid&type=Date)](https://star-history.com/#sandeep-alluru/polaroid&Date)

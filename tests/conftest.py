@@ -1,8 +1,8 @@
-"""Shared pytest fixtures for scenemem tests."""
+"""Shared pytest fixtures for polaroid tests."""
 
 import pytest
 
-from scenemem.store import SceneStore
+from polaroid.store import SceneStore
 
 
 @pytest.fixture

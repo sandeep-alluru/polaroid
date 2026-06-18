@@ -1,5 +1,5 @@
 """
-scenemem demo — embeddable CRDT scene graph for embodied AI agents.
+polaroid demo — embeddable CRDT scene graph for embodied AI agents.
 
 Demonstrates:
 1. Creating two scene graphs (simulating two robots)
@@ -16,11 +16,11 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from scenemem.graph import SceneEdge, SceneNode
-from scenemem.merger import SceneMerger
-from scenemem.query import SceneQuery
-from scenemem.report import print_merge, print_scene, to_markdown
-from scenemem.store import SceneStore
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.merger import SceneMerger
+from polaroid.query import SceneQuery
+from polaroid.report import print_merge, print_scene, to_markdown
+from polaroid.store import SceneStore
 
 
 def main() -> None:
@@ -146,7 +146,7 @@ def main() -> None:
 
         # ── Markdown report ────────────────────────────────────────────────────
         md = to_markdown(all_nodes)
-        assert "scenemem" in md
+        assert "polaroid" in md
         print("\n✓ Markdown report generated successfully")
 
         store_a.close()

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from scenemem.graph import SceneEdge, SceneNode
-from scenemem.store import SceneStore
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.store import SceneStore
 
 # ── File creation ─────────────────────────────────────────────────────────────
 

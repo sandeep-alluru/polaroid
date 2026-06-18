@@ -1,4 +1,4 @@
-# scenemem — Agent Context
+# polaroid — Agent Context
 
 This file describes the project architecture for AI coding assistants (Claude Code, Cursor, Copilot).
 
@@ -9,7 +9,7 @@ Embeddable CRDT scene graph for embodied AI agents
 ## Module map
 
 ```
-src/scenemem/
+src/polaroid/
 ├── # TODO: fill in module map
 ```
 

@@ -3,7 +3,7 @@
     "type": "function",
     "function": {
       "name": "add_scene_node",
-      "description": "Add or update a node (object, room, surface, region, or agent) in the scenemem scene graph. Use this when you observe a new entity in the environment.",
+      "description": "Add or update a node (object, room, surface, region, or agent) in the polaroid scene graph. Use this when you observe a new entity in the environment.",
       "strict": true,
       "parameters": {
         "type": "object",
@@ -34,7 +34,7 @@
           },
           "db": {
             "type": "string",
-            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+            "description": "Path to the SQLite scene database. Defaults to .polaroid/scene.db."
           }
         },
         "required": ["label", "node_type"],
@@ -46,7 +46,7 @@
     "type": "function",
     "function": {
       "name": "query_nodes",
-      "description": "Query nodes in the scenemem scene graph by type, label substring, or minimum confidence. Use this to find objects, rooms, or surfaces in the environment.",
+      "description": "Query nodes in the polaroid scene graph by type, label substring, or minimum confidence. Use this to find objects, rooms, or surfaces in the environment.",
       "strict": true,
       "parameters": {
         "type": "object",
@@ -68,7 +68,7 @@
           },
           "db": {
             "type": "string",
-            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+            "description": "Path to the SQLite scene database. Defaults to .polaroid/scene.db."
           }
         },
         "required": [],
@@ -91,7 +91,7 @@
           },
           "db": {
             "type": "string",
-            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+            "description": "Path to the SQLite scene database. Defaults to .polaroid/scene.db."
           }
         },
         "required": [],
@@ -129,7 +129,7 @@
           },
           "db": {
             "type": "string",
-            "description": "Path to the SQLite scene database. Defaults to .scenemem/scene.db."
+            "description": "Path to the SQLite scene database. Defaults to .polaroid/scene.db."
           }
         },
         "required": ["source_id", "target_id", "relation"],

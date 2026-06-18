@@ -1,6 +1,6 @@
 openapi: "3.1.0"
 info:
-  title: scenemem API
+  title: polaroid API
   description: Embeddable CRDT scene graph for embodied AI agents
   version: "0.1.0"
   contact:
@@ -8,7 +8,7 @@ info:
     email: onepuncchh@gmail.com
   license:
     name: MIT
-    url: https://github.com/sandeep-alluru/scenemem/blob/main/LICENSE
+    url: https://github.com/sandeep-alluru/polaroid/blob/main/LICENSE
 
 servers:
   - url: http://localhost:8000

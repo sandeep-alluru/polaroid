@@ -3,14 +3,14 @@
 ## Top-level exports
 
 ```python
-import scenemem
+import polaroid
 ```
 
 <!-- mkdocstrings will auto-generate from docstrings below -->
 
-::: scenemem
+::: polaroid
 
 <!-- TODO: add per-module sections as you implement them:
-::: scenemem.core
-::: scenemem.cli
+::: polaroid.core
+::: polaroid.cli
 -->

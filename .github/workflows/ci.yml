@@ -41,7 +41,7 @@ jobs:
         run: ruff format --check src/ tests/
 
       - name: Type check
-        run: mypy src/scenemem/ --ignore-missing-imports
+        run: mypy src/polaroid/ --ignore-missing-imports
 
       - name: Test
         run: pytest tests/ -v --tb=short
@@ -68,12 +68,12 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-3.11-${{ hashFiles('pyproject.toml') }}
-      - name: Install scenemem
+      - name: Install polaroid
         run: pip install -e .
       - name: Check scene state (if DB exists)
         run: |
-          if [ -f .scenemem/scene.db ]; then
-            scenemem status
+          if [ -f .polaroid/scene.db ]; then
+            polaroid status
           else
             echo "No scene DB — skipping physics gate."
           fi

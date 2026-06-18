@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from scenemem.graph import MergeResult, SceneEdge, SceneNode, _sha16
+from polaroid.graph import MergeResult, SceneEdge, SceneNode, _sha16
 
 # ── _sha16 ────────────────────────────────────────────────────────────────────
 

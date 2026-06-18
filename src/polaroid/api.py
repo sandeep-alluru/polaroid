@@ -1,7 +1,7 @@
-"""FastAPI REST wrapper for scenemem.
+"""FastAPI REST wrapper for polaroid.
 
-Start:   uvicorn scenemem.api:app --reload
-Install: pip install "scenemem[api]"
+Start:   uvicorn polaroid.api:app --reload
+Install: pip install "polaroid[api]"
 Docs:    http://localhost:8000/docs
 """
 
@@ -14,25 +14,25 @@ try:
     from fastapi import FastAPI
     from pydantic import BaseModel, Field
 except ImportError as exc:
-    raise ImportError("API server requires: pip install 'scenemem[api]'") from exc
+    raise ImportError("API server requires: pip install 'polaroid[api]'") from exc
 
-from scenemem import __version__
-from scenemem.graph import SceneEdge, SceneNode
-from scenemem.merger import SceneMerger
-from scenemem.query import SceneQuery
-from scenemem.store import SceneStore
+from polaroid import __version__
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.merger import SceneMerger
+from polaroid.query import SceneQuery
+from polaroid.store import SceneStore
 
 app = FastAPI(
-    title="scenemem API",
+    title="polaroid API",
     description="Embeddable CRDT scene graph for embodied AI agents.",
     version=__version__,
     license_info={
         "name": "MIT",
-        "url": "https://github.com/sandeep-alluru/scenemem/blob/main/LICENSE",
+        "url": "https://github.com/sandeep-alluru/polaroid/blob/main/LICENSE",
     },
 )
 
-_DEFAULT_DB = ".scenemem/scene.db"
+_DEFAULT_DB = ".polaroid/scene.db"
 
 
 class HealthResponse(BaseModel):

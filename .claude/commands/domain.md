@@ -1,4 +1,4 @@
-Domain-specific slash commands for scenemem.
+Domain-specific slash commands for polaroid.
 
 Replace this file with commands that match the tool's core operations.
 See agentdelta's .claude/commands/ for reference examples:

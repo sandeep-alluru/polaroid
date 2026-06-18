@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install scenemem
+pip install polaroid
 ```
 
 ## Step 1
@@ -17,7 +17,7 @@ TODO: second step
 ## Python API
 
 ```python
-import scenemem
+import polaroid
 
 # TODO: add real API example
 ```

@@ -1,5 +1,5 @@
 """
-End-to-end smoke test for scenemem.
+End-to-end smoke test for polaroid.
 
 Simulates a user who just cloned the repo and wants to verify everything works.
 No mocking, no fixtures — real behaviour, real CLI, real HTTP server.
@@ -68,18 +68,18 @@ section("1. Package import")
 
 
 def _test_import_version():
-    import scenemem
-    assert scenemem.__version__, "__version__ is empty"
-    assert scenemem.__version__ != "0.0.0"
+    import polaroid
+    assert polaroid.__version__, "__version__ is empty"
+    assert polaroid.__version__ != "0.0.0"
 
 
 def _test_import_public_api():
-    from scenemem import MergeResult, SceneEdge, SceneMerger, SceneNode, SceneQuery, SceneStore
+    from polaroid import MergeResult, SceneEdge, SceneMerger, SceneNode, SceneQuery, SceneStore
     assert callable(SceneMerger)
     assert callable(SceneQuery)
 
 
-run("scenemem package imports", _test_import_version)
+run("polaroid package imports", _test_import_version)
 run("Public API (SceneNode, SceneEdge, SceneMerger, SceneQuery, SceneStore)", _test_import_public_api)
 
 
@@ -89,7 +89,7 @@ section("2. Core data model (SceneNode, SceneEdge, SceneStore)")
 
 
 def _test_node_content_addressed():
-    from scenemem.graph import SceneNode
+    from polaroid.graph import SceneNode
     n1 = SceneNode(label="door-1", node_type="object", properties={})
     n2 = SceneNode(label="door-1", node_type="object", properties={})
     assert n1.id == n2.id, "Same label+type must produce same ID"
@@ -98,7 +98,7 @@ def _test_node_content_addressed():
 
 
 def _test_node_serialization():
-    from scenemem.graph import SceneNode
+    from polaroid.graph import SceneNode
     n = SceneNode(label="table-A", node_type="object", properties={"color": "brown"}, confidence=0.9)
     d = n.to_dict()
     assert d["label"] == "table-A"
@@ -109,7 +109,7 @@ def _test_node_serialization():
 
 
 def _test_edge_content_addressed():
-    from scenemem.graph import SceneEdge
+    from polaroid.graph import SceneEdge
     e1 = SceneEdge(source_id="aaa", target_id="bbb", relation="contains")
     e2 = SceneEdge(source_id="aaa", target_id="bbb", relation="contains")
     assert e1.id == e2.id
@@ -118,7 +118,7 @@ def _test_edge_content_addressed():
 
 
 def _test_edge_serialization():
-    from scenemem.graph import SceneEdge
+    from polaroid.graph import SceneEdge
     e = SceneEdge(source_id="src", target_id="tgt", relation="on-top-of", confidence=0.7)
     d = e.to_dict()
     e2 = SceneEdge.from_dict(d)
@@ -127,8 +127,8 @@ def _test_edge_serialization():
 
 
 def _test_store_upsert_and_get():
-    from scenemem.graph import SceneNode
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/scene.db") as s:
             n = SceneNode(label="door-1", node_type="object", properties={})
@@ -139,8 +139,8 @@ def _test_store_upsert_and_get():
 
 
 def _test_store_confidence_upsert():
-    from scenemem.graph import SceneNode
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/scene.db") as s:
             n_low = SceneNode(label="door-1", node_type="object", properties={"state": "closed"}, confidence=0.3)
@@ -167,9 +167,9 @@ section("3. SceneMerger + SceneQuery")
 
 
 def _test_merger_adds_new_nodes():
-    from scenemem.graph import SceneNode
-    from scenemem.merger import SceneMerger
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.merger import SceneMerger
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/local.db") as local, \
              SceneStore(f"{tmp}/remote.db") as remote:
@@ -181,9 +181,9 @@ def _test_merger_adds_new_nodes():
 
 
 def _test_merger_conflict_resolution():
-    from scenemem.graph import SceneNode
-    from scenemem.merger import SceneMerger
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.merger import SceneMerger
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/local.db") as local, \
              SceneStore(f"{tmp}/remote.db") as remote:
@@ -199,9 +199,9 @@ def _test_merger_conflict_resolution():
 
 
 def _test_merger_idempotent():
-    from scenemem.graph import SceneNode
-    from scenemem.merger import SceneMerger
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.merger import SceneMerger
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/local.db") as local, \
              SceneStore(f"{tmp}/remote.db") as remote:
@@ -215,9 +215,9 @@ def _test_merger_idempotent():
 
 
 def _test_query_find_nodes():
-    from scenemem.graph import SceneNode
-    from scenemem.query import SceneQuery
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.query import SceneQuery
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/scene.db") as s:
             s.upsert_node(SceneNode(label="door-1", node_type="object", properties={}))
@@ -229,9 +229,9 @@ def _test_query_find_nodes():
 
 
 def _test_query_context_summary():
-    from scenemem.graph import SceneEdge, SceneNode
-    from scenemem.query import SceneQuery
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneEdge, SceneNode
+    from polaroid.query import SceneQuery
+    from polaroid.store import SceneStore
     with tempfile.TemporaryDirectory() as tmp:
         with SceneStore(f"{tmp}/scene.db") as s:
             n1 = SceneNode(label="room-kitchen", node_type="room", properties={})
@@ -259,8 +259,8 @@ section("4. Report formatters")
 
 
 def _test_to_json_valid():
-    from scenemem.graph import SceneNode
-    from scenemem.report import to_json
+    from polaroid.graph import SceneNode
+    from polaroid.report import to_json
     nodes = [SceneNode(label="x", node_type="object", properties={})]
     parsed = json.loads(to_json(nodes))
     assert parsed["node_count"] == 1
@@ -268,8 +268,8 @@ def _test_to_json_valid():
 
 
 def _test_to_json_with_edges():
-    from scenemem.graph import SceneEdge, SceneNode
-    from scenemem.report import to_json
+    from polaroid.graph import SceneEdge, SceneNode
+    from polaroid.report import to_json
     nodes = [SceneNode(label="x", node_type="object", properties={})]
     edges = [SceneEdge(source_id="a", target_id="b", relation="contains")]
     parsed = json.loads(to_json(nodes, edges))
@@ -278,11 +278,11 @@ def _test_to_json_with_edges():
 
 
 def _test_to_markdown():
-    from scenemem.graph import SceneNode
-    from scenemem.report import to_markdown
+    from polaroid.graph import SceneNode
+    from polaroid.report import to_markdown
     nodes = [SceneNode(label="table-A", node_type="object", properties={}, confidence=0.9)]
     md = to_markdown(nodes)
-    assert "scenemem" in md
+    assert "polaroid" in md
     assert "table-A" in md
     assert "|" in md
 
@@ -290,8 +290,8 @@ def _test_to_markdown():
 def _test_print_scene():
     import io
     from rich.console import Console
-    from scenemem.graph import SceneNode
-    from scenemem.report import print_scene
+    from polaroid.graph import SceneNode
+    from polaroid.report import print_scene
     buf = io.StringIO()
     con = Console(file=buf, highlight=False)
     nodes = [SceneNode(label="door-1", node_type="object", properties={})]
@@ -303,8 +303,8 @@ def _test_print_scene():
 def _test_print_merge():
     import io
     from rich.console import Console
-    from scenemem.graph import MergeResult
-    from scenemem.report import print_merge
+    from polaroid.graph import MergeResult
+    from polaroid.report import print_merge
     buf = io.StringIO()
     con = Console(file=buf, highlight=False)
     result = MergeResult(added_nodes=[], updated_nodes=[], added_edges=[], conflicts_resolved=0)
@@ -322,12 +322,12 @@ run("print_merge() outputs merge summary to console", _test_print_merge)
 
 # ── 5. CLI ────────────────────────────────────────────────────────────────────
 
-section("5. CLI (scenemem)")
+section("5. CLI (polaroid)")
 
 
 def _test_cli_help():
     r = subprocess.run(
-        [PYTHON, "-m", "scenemem.cli", "--help"],
+        [PYTHON, "-m", "polaroid.cli", "--help"],
         capture_output=True, text=True
     )
     assert r.returncode == 0
@@ -338,7 +338,7 @@ def _test_cli_add_node():
     with tempfile.TemporaryDirectory() as tmp:
         db = f"{tmp}/scene.db"
         r = subprocess.run(
-            [PYTHON, "-m", "scenemem.cli", "--db", db, "add-node", "door-1", "object"],
+            [PYTHON, "-m", "polaroid.cli", "--db", db, "add-node", "door-1", "object"],
             capture_output=True, text=True
         )
         assert r.returncode == 0, f"add-node failed: {r.stderr}"
@@ -349,35 +349,35 @@ def _test_cli_status():
     with tempfile.TemporaryDirectory() as tmp:
         db = f"{tmp}/scene.db"
         subprocess.run(
-            [PYTHON, "-m", "scenemem.cli", "--db", db, "add-node", "x", "object"],
+            [PYTHON, "-m", "polaroid.cli", "--db", db, "add-node", "x", "object"],
             capture_output=True
         )
         r = subprocess.run(
-            [PYTHON, "-m", "scenemem.cli", "--db", db, "status"],
+            [PYTHON, "-m", "polaroid.cli", "--db", db, "status"],
             capture_output=True, text=True
         )
         assert r.returncode == 0
         assert "1" in r.stdout
 
 
-run("scenemem --help returns 0", _test_cli_help)
-run("scenemem add-node works and prints node label", _test_cli_add_node)
-run("scenemem status shows node count", _test_cli_status)
+run("polaroid --help returns 0", _test_cli_help)
+run("polaroid add-node works and prints node label", _test_cli_add_node)
+run("polaroid status shows node count", _test_cli_status)
 
 
 # ── 6. FastAPI server ─────────────────────────────────────────────────────────
 
-section("6. FastAPI server (scenemem[api])")
+section("6. FastAPI server (polaroid[api])")
 
 
 def _test_api_import():
-    from scenemem.api import app
-    assert app.title == "scenemem API"
+    from polaroid.api import app
+    assert app.title == "polaroid API"
 
 
 def _test_api_health():
     from fastapi.testclient import TestClient
-    from scenemem.api import app
+    from polaroid.api import app
     client = TestClient(app)
     r = client.get("/health")
     assert r.status_code == 200
@@ -387,7 +387,7 @@ def _test_api_health():
 
 def _test_api_node_and_context():
     from fastapi.testclient import TestClient
-    from scenemem.api import app
+    from polaroid.api import app
     client = TestClient(app)
     with tempfile.TemporaryDirectory() as tmp:
         db = f"{tmp}/scene.db"
@@ -410,8 +410,8 @@ def _test_api_node_and_context():
 
 def _test_api_merge():
     from fastapi.testclient import TestClient
-    from scenemem.api import app
-    from scenemem.graph import SceneNode
+    from polaroid.api import app
+    from polaroid.graph import SceneNode
     client = TestClient(app)
     with tempfile.TemporaryDirectory() as tmp:
         db = f"{tmp}/scene.db"
@@ -425,7 +425,7 @@ def _test_api_merge():
         assert len(r.json()["added_nodes"]) == 1
 
 
-run("scenemem.api imports and app.title is correct", _test_api_import)
+run("polaroid.api imports and app.title is correct", _test_api_import)
 run("GET /health returns {status: ok, version: ...}", _test_api_health)
 run("POST /node + GET /nodes + GET /context workflow", _test_api_node_and_context)
 run("POST /merge adds nodes from other store", _test_api_merge)
@@ -433,16 +433,16 @@ run("POST /merge adds nodes from other store", _test_api_merge)
 
 # ── 7. MCP server ─────────────────────────────────────────────────────────────
 
-section("7. MCP server (scenemem[mcp])")
+section("7. MCP server (polaroid[mcp])")
 
 
 def _test_mcp_server_importable():
-    import scenemem.mcp_server as m
+    import polaroid.mcp_server as m
     assert hasattr(m, "run_server")
 
 
 def _test_mcp_server_loads_cleanly():
-    import scenemem.mcp_server  # noqa: F401
+    import polaroid.mcp_server  # noqa: F401
 
 
 run("mcp_server.py imports without error", _test_mcp_server_importable)
@@ -571,7 +571,7 @@ if failed:
         print(f"    {YELLOW}→ {short}{RESET}")
     print(f"\n{YELLOW}Tip: run with --verbose for full tracebacks{RESET}")
 else:
-    print(f"{GREEN}All {total} checks passed — scenemem is ready to ship{RESET}")
+    print(f"{GREEN}All {total} checks passed — polaroid is ready to ship{RESET}")
 
 print(f"{'═'*60}\n")
 sys.exit(0 if not failed else 1)

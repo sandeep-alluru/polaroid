@@ -1,13 +1,13 @@
-"""MCP server for scenemem.
+"""MCP server for polaroid.
 
-Start:  python -m scenemem.mcp_server
-Or:     scenemem-mcp
+Start:  python -m polaroid.mcp_server
+Or:     polaroid-mcp
 
 Add to Claude Desktop (~/.config/claude/claude_desktop_config.json):
     {
         "mcpServers": {
-            "scenemem": {
-                "command": "scenemem-mcp"
+            "polaroid": {
+                "command": "polaroid-mcp"
             }
         }
     }
@@ -28,7 +28,7 @@ def _require_mcp() -> Any:
         return mcp, types, _Server
     except ImportError:
         print(
-            "MCP server requires: pip install 'scenemem[mcp]'",
+            "MCP server requires: pip install 'polaroid[mcp]'",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -38,18 +38,18 @@ def run_server() -> None:
     """Start the MCP server on stdio."""
     mcp_mod, types, server_cls = _require_mcp()
 
-    from scenemem.graph import SceneNode
-    from scenemem.query import SceneQuery
-    from scenemem.store import SceneStore
+    from polaroid.graph import SceneNode
+    from polaroid.query import SceneQuery
+    from polaroid.store import SceneStore
 
-    server = server_cls("scenemem")
+    server = server_cls("polaroid")
 
     @server.list_tools()
     async def list_tools() -> list[types.Tool]:
         return [
             types.Tool(
                 name="add_scene_node",
-                description="Add or update a node in the scenemem scene graph.",
+                description="Add or update a node in the polaroid scene graph.",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -93,7 +93,7 @@ def run_server() -> None:
     async def call_tool(
         name: str, arguments: dict[str, Any]
     ) -> list[types.TextContent]:
-        db = arguments.get("db", ".scenemem/scene.db")
+        db = arguments.get("db", ".polaroid/scene.db")
 
         if name == "add_scene_node":
             node = SceneNode(

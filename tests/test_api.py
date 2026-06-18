@@ -8,7 +8,7 @@ pytest.importorskip("fastapi", reason="fastapi not installed")
 
 from fastapi.testclient import TestClient
 
-from scenemem.api import app
+from polaroid.api import app
 
 
 @pytest.fixture
@@ -123,7 +123,7 @@ def test_get_nodes_filter_by_confidence(client, db):
 
 
 def test_post_merge_adds_nodes(client, db):
-    from scenemem.graph import SceneNode
+    from polaroid.graph import SceneNode
 
     remote_node = SceneNode(label="peer-node", node_type="object", properties={})
     r = client.post(

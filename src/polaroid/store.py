@@ -6,7 +6,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-from scenemem.graph import SceneEdge, SceneNode
+from polaroid.graph import SceneEdge, SceneNode
 
 
 class SceneStore:

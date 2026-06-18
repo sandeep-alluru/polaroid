@@ -1,11 +1,11 @@
-# GitHub Copilot Instructions — scenemem
+# GitHub Copilot Instructions — polaroid
 
-scenemem: Embeddable CRDT scene graph for embodied AI agents
+polaroid: Embeddable CRDT scene graph for embodied AI agents
 
 ## Module map
 
 ```
-src/scenemem/
+src/polaroid/
 ├── # TODO: fill in after implementation
 ```
 
@@ -29,6 +29,6 @@ src/scenemem/
 
 ## Adding a new adapter / integration
 
-1. Create `src/scenemem/instrument_<framework>.py`
+1. Create `src/polaroid/instrument_<framework>.py`
 2. Export from `__init__.py`, add to `__all__` alphabetically
 3. Add tests

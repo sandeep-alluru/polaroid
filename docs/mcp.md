@@ -1,11 +1,11 @@
 # MCP / Claude Integration
 
-scenemem ships an MCP server that exposes its core operations as native Claude tools.
+polaroid ships an MCP server that exposes its core operations as native Claude tools.
 
 ## Install
 
 ```bash
-pip install "scenemem[mcp]"
+pip install "polaroid[mcp]"
 ```
 
 ## Add to Claude Desktop
@@ -16,8 +16,8 @@ Edit `~/.config/claude/claude_desktop_config.json` (Linux) or
 ```json
 {
   "mcpServers": {
-    "scenemem": {
-      "command": "scenemem-mcp"
+    "polaroid": {
+      "command": "polaroid-mcp"
     }
   }
 }
@@ -35,4 +35,4 @@ After cloning the repo, these project-level commands are available:
 
 ## Smithery
 
-scenemem is listed on [smithery.ai](https://smithery.ai) — search for "scenemem" to install with one click.
+polaroid is listed on [smithery.ai](https://smithery.ai) — search for "polaroid" to install with one click.

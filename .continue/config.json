@@ -1,5 +1,5 @@
 {
-  "name": "scenemem",
+  "name": "polaroid",
   "version": "0.1.0",
   "schema": "v1",
   "context": [
@@ -8,7 +8,7 @@
   ],
   "docs": [
     {
-      "title": "scenemem Architecture",
+      "title": "polaroid Architecture",
       "startUrl": "file://./ARCHITECTURE.md",
       "faviconUrl": ""
     }
@@ -16,12 +16,12 @@
   "customCommands": [
     {
       "name": "explain",
-      "prompt": "Explain how this part of scenemem works: {input}. Use the module map in AGENTS.md as context.",
+      "prompt": "Explain how this part of polaroid works: {input}. Use the module map in AGENTS.md as context.",
       "description": "Explain a part of the codebase"
     }
   ],
   "rules": [
-    "This is scenemem — Embeddable CRDT scene graph for embodied AI agents.",
+    "This is polaroid — Embeddable CRDT scene graph for embodied AI agents.",
     "Library code must not use print() — use rich.console.Console.",
     "All public API must have type annotations and docstrings.",
     "Tests use pytest. CLI tests use click.testing.CliRunner."

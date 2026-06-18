@@ -1,36 +1,36 @@
-"""Command-line interface for scenemem."""
+"""Command-line interface for polaroid."""
 
 from __future__ import annotations
 
 import click
 
-from scenemem.graph import SceneEdge, SceneNode
-from scenemem.merger import SceneMerger
-from scenemem.query import SceneQuery
-from scenemem.report import print_merge, print_scene, to_json
-from scenemem.store import SceneStore
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.merger import SceneMerger
+from polaroid.query import SceneQuery
+from polaroid.report import print_merge, print_scene, to_json
+from polaroid.store import SceneStore
 
 
 def _store(ctx: click.Context) -> SceneStore:
     """Return a SceneStore from the context or default path."""
-    db_path = ctx.obj.get("db") if ctx.obj else ".scenemem/scene.db"
+    db_path = ctx.obj.get("db") if ctx.obj else ".polaroid/scene.db"
     return SceneStore(db_path)
 
 
 @click.group()
-@click.version_option(package_name="scenemem")
+@click.version_option(package_name="polaroid")
 @click.option(
     "--db",
-    default=".scenemem/scene.db",
+    default=".polaroid/scene.db",
     show_default=True,
-    help="Path to the scenemem database.",
-    envvar="SCENEMEM_DB",
+    help="Path to the polaroid database.",
+    envvar="POLAROID_DB",
 )
 @click.pass_context
 def main(ctx: click.Context, db: str) -> None:
     """Embeddable CRDT scene graph for embodied AI agents.
 
-    scenemem stores, merges, and queries spatial scene graphs so multiple
+    polaroid stores, merges, and queries spatial scene graphs so multiple
     robots/agents can share a persistent map without a central server.
     """
     ctx.ensure_object(dict)
@@ -62,8 +62,8 @@ def add_node(
 
     \b
     Examples:
-      scenemem add-node door-1 object --confidence 0.95 --property color=red
-      scenemem add-node room-kitchen room
+      polaroid add-node door-1 object --confidence 0.95 --property color=red
+      polaroid add-node room-kitchen room
     """
     props: dict = {}
     for kv in properties:
@@ -104,8 +104,8 @@ def add_edge(
 
     \b
     Examples:
-      scenemem add-edge <src-id> <tgt-id> contains
-      scenemem add-edge <src-id> <tgt-id> adjacent-to --confidence 0.8
+      polaroid add-edge <src-id> <tgt-id> contains
+      polaroid add-edge <src-id> <tgt-id> adjacent-to --confidence 0.8
     """
     edge = SceneEdge(
         source_id=source,
@@ -147,9 +147,9 @@ def query(
 
     \b
     Examples:
-      scenemem query
-      scenemem query --type object
-      scenemem query --label door --min-confidence 0.8
+      polaroid query
+      polaroid query --type object
+      polaroid query --label door --min-confidence 0.8
     """
     with _store(ctx) as store:
         q = SceneQuery(store)
@@ -174,7 +174,7 @@ def merge(ctx: click.Context, other_db: str) -> None:
 
     \b
     Examples:
-      scenemem merge /path/to/robot2.db
+      polaroid merge /path/to/robot2.db
     """
     with _store(ctx) as local, SceneStore(other_db) as remote:
         merger = SceneMerger()

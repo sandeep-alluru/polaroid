@@ -1,4 +1,4 @@
-# Contributing to scenemem
+# Contributing to polaroid
 
 Thank you for your interest in contributing. This guide covers everything you need to go from zero to a merged PR.
 
@@ -16,8 +16,8 @@ Thank you for your interest in contributing. This guide covers everything you ne
 ## Quick start
 
 ```bash
-git clone https://github.com/sandeep-alluru/scenemem
-cd scenemem
+git clone https://github.com/sandeep-alluru/polaroid
+cd polaroid
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install
@@ -37,14 +37,14 @@ Or individually:
 ```bash
 pytest tests/ -v
 ruff check src/ tests/
-mypy src/scenemem/
+mypy src/polaroid/
 ```
 
 ## Adding a new physics body type
 
-1. Create `src/scenemem/bodies/{body_type}.py`
+1. Create `src/polaroid/bodies/{body_type}.py`
 2. Implement a class that inherits from `PhysicsBody` and implements `step(dt: float) -> BodyState`
-3. Export the class from `src/scenemem/bodies/__init__.py`
+3. Export the class from `src/polaroid/bodies/__init__.py`
 4. Add tests in `tests/test_{body_type}.py` covering integration stability, collision, and edge cases
 5. Document the new body type in the `## Physics primitives` section of the README
 

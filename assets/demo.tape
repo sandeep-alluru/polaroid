@@ -1,4 +1,4 @@
-# scenemem demo — generate with: vhs assets/demo.tape
+# polaroid demo — generate with: vhs assets/demo.tape
 # Install vhs: https://github.com/charmbracelet/vhs  (brew install vhs)
 
 Output assets/demo.gif
@@ -10,10 +10,10 @@ Set Padding 20
 Set PlaybackSpeed 1.0
 
 # Install
-Type "pip install scenemem" Sleep 500ms Enter
+Type "pip install polaroid" Sleep 500ms Enter
 Sleep 2s
 Ctrl+L
 
 # TODO: replace below with real demo commands for this project
-Type "scenemem --help" Sleep 300ms Enter
+Type "polaroid --help" Sleep 300ms Enter
 Sleep 3s

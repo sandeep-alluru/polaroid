@@ -21,7 +21,7 @@ fmt:
 	ruff check --fix src/ tests/
 
 typecheck:
-	mypy src/scenemem/
+	mypy src/polaroid/
 
 docs:
 	mkdocs serve

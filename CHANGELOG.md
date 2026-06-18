@@ -21,5 +21,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 114 unit tests, 86% branch coverage
 - `examples/demo.py` end-to-end demonstration
 
-[Unreleased]: https://github.com/sandeep-alluru/scenemem/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/sandeep-alluru/scenemem/releases/tag/v0.1.0
+[Unreleased]: https://github.com/sandeep-alluru/polaroid/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/sandeep-alluru/polaroid/releases/tag/v0.1.0

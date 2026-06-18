@@ -1,4 +1,4 @@
-# scenemem
+# polaroid
 
 **Embeddable CRDT scene graph for embodied AI agents**
 
@@ -10,14 +10,14 @@
 ## Install
 
 ```bash
-pip install scenemem
+pip install polaroid
 ```
 
 ## Quick example
 
 ```bash
 # TODO: add real usage example
-scenemem --help
+polaroid --help
 ```
 
 ## Why

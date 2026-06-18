@@ -1,11 +1,11 @@
 # Architecture
 
-scenemem is a pure-Python library. Embeddable CRDT scene graph for embodied AI agents
+polaroid is a pure-Python library. Embeddable CRDT scene graph for embodied AI agents
 
 ## Module map
 
 ```
-src/scenemem/
+src/polaroid/
 ├── # TODO: fill in
 ```
 

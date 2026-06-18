@@ -4,15 +4,15 @@ For the full contribution guide see [CONTRIBUTING.md](../CONTRIBUTING.md) in the
 
 ## Quick links
 
-- [Bug report](https://github.com/sandeep-alluru/scenemem/issues/new?template=bug_report.yml)
-- [Feature request](https://github.com/sandeep-alluru/scenemem/issues/new?template=feature_request.yml)
+- [Bug report](https://github.com/sandeep-alluru/polaroid/issues/new?template=bug_report.yml)
+- [Feature request](https://github.com/sandeep-alluru/polaroid/issues/new?template=feature_request.yml)
 - [Architecture](architecture.md)
 
 ## Dev setup
 
 ```bash
-git clone https://github.com/sandeep-alluru/scenemem
-cd scenemem
+git clone https://github.com/sandeep-alluru/polaroid
+cd polaroid
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install

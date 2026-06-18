@@ -8,8 +8,8 @@ Algorithm:
 
 from __future__ import annotations
 
-from scenemem.graph import MergeResult, SceneEdge, SceneNode
-from scenemem.store import SceneStore
+from polaroid.graph import MergeResult, SceneEdge, SceneNode
+from polaroid.store import SceneStore
 
 
 class SceneMerger:

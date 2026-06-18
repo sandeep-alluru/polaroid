@@ -1,6 +1,6 @@
 # CLI Reference
 
-## `scenemem <command>`
+## `polaroid <command>`
 
 TODO: document CLI commands and options
 

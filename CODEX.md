@@ -1,4 +1,4 @@
-# scenemem — Codex Developer Guide
+# polaroid — Codex Developer Guide
 
 > Read by OpenAI Codex CLI. Supplements AGENTS.md with Codex-specific conventions.
 
@@ -9,7 +9,7 @@ Embeddable CRDT scene graph for embodied AI agents
 ## Module map
 
 ```
-src/scenemem/
+src/polaroid/
 ├── # TODO: fill in after implementation
 ```
 

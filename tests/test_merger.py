@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from scenemem.graph import SceneEdge, SceneNode
-from scenemem.merger import SceneMerger
-from scenemem.store import SceneStore
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.merger import SceneMerger
+from polaroid.store import SceneStore
 
 
 @pytest.fixture

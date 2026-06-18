@@ -1,4 +1,4 @@
-"""Core data model for scenemem scene graph.
+"""Core data model for polaroid scene graph.
 
 SceneNode, SceneEdge, and MergeResult dataclasses with content-addressing.
 """

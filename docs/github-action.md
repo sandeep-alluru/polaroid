@@ -1,10 +1,10 @@
 # GitHub Action
 
-Use scenemem directly in your GitHub Actions workflow:
+Use polaroid directly in your GitHub Actions workflow:
 
 ```yaml
-- name: scenemem
-  uses: sandeep-alluru/scenemem@v0.1.0
+- name: polaroid
+  uses: sandeep-alluru/polaroid@v0.1.0
   with:
     # TODO: add action inputs
     fail-on-error: "true"
@@ -13,9 +13,9 @@ Use scenemem directly in your GitHub Actions workflow:
 Or use the CLI directly:
 
 ```yaml
-- name: Install scenemem
-  run: pip install scenemem
+- name: Install polaroid
+  run: pip install polaroid
 
-- name: Run scenemem
-  run: scenemem --help
+- name: Run polaroid
+  run: polaroid --help
 ```

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from scenemem.graph import SceneNode
-from scenemem.store import SceneStore
+from polaroid.graph import SceneNode
+from polaroid.store import SceneStore
 
 
 class SceneQuery:
