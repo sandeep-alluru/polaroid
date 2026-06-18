@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "polaroid"
+name = "polaroid-ai"
 version = "0.1.0"
 description = "Embeddable CRDT scene graph for embodied AI agents"
 readme = "README.md"
