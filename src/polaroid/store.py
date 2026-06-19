@@ -186,11 +186,13 @@ class SceneStore:
 
     def node_count(self) -> int:
         """Return total number of nodes."""
-        return self._conn.execute("SELECT COUNT(*) FROM nodes").fetchone()[0]
+        row = self._conn.execute("SELECT COUNT(*) FROM nodes").fetchone()
+        return int(row[0]) if row else 0
 
     def edge_count(self) -> int:
         """Return total number of edges."""
-        return self._conn.execute("SELECT COUNT(*) FROM edges").fetchone()[0]
+        row = self._conn.execute("SELECT COUNT(*) FROM edges").fetchone()
+        return int(row[0]) if row else 0
 
     # ── Lifecycle ──────────────────────────────────────────────────────────────
 

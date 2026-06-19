@@ -1,8 +1,6 @@
 """Tests for polaroid.subgraph module."""
 from __future__ import annotations
 
-import pytest
-
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.store import SceneStore
 from polaroid.subgraph import extract_subgraph, filter_by_type, neighborhood

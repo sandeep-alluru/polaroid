@@ -3,8 +3,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from polaroid.export import to_adjacency_matrix, to_dot, to_json
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.store import SceneStore

@@ -11,6 +11,12 @@ def extract_subgraph(store: SceneStore, root_id: str, max_depth: int = 3) -> Sce
 
     Returns a new in-memory SceneStore.
     """
+    # Fetch all edges once upfront to avoid O(N×E) repeated queries inside the BFS loop.
+    all_edges = store.list_edges()
+    adjacency: dict[str, list] = {}
+    for edge in all_edges:
+        adjacency.setdefault(edge.source_id, []).append(edge)
+
     visited: set[str] = set()
     queue: deque[tuple[str, int]] = deque([(root_id, 0)])
 
@@ -20,8 +26,8 @@ def extract_subgraph(store: SceneStore, root_id: str, max_depth: int = 3) -> Sce
             continue
         visited.add(node_id)
         if depth < max_depth:
-            for edge in store.list_edges():
-                if edge.source_id == node_id and edge.target_id not in visited:
+            for edge in adjacency.get(node_id, []):
+                if edge.target_id not in visited:
                     queue.append((edge.target_id, depth + 1))
 
     sub = SceneStore(":memory:")
@@ -30,7 +36,7 @@ def extract_subgraph(store: SceneStore, root_id: str, max_depth: int = 3) -> Sce
         if node is not None:
             sub.upsert_node(node)
 
-    for edge in store.list_edges():
+    for edge in all_edges:
         if edge.source_id in visited and edge.target_id in visited:
             sub.upsert_edge(edge)
 
@@ -56,14 +62,21 @@ def filter_by_type(store: SceneStore, node_types: list[str]) -> SceneStore:
 
 def neighborhood(store: SceneStore, node_id: str, radius: int = 1) -> list[str]:
     """Return all node IDs within `radius` hops of node_id."""
+    # Fetch all edges once upfront to avoid O(radius×E) repeated queries.
+    all_edges = store.list_edges()
+    adjacency: dict[str, list[str]] = {}
+    for edge in all_edges:
+        adjacency.setdefault(edge.source_id, []).append(edge.target_id)
+
     visited: set[str] = {node_id}
     frontier: set[str] = {node_id}
 
     for _ in range(radius):
         next_frontier: set[str] = set()
-        for edge in store.list_edges():
-            if edge.source_id in frontier and edge.target_id not in visited:
-                next_frontier.add(edge.target_id)
+        for nid in frontier:
+            for neighbor in adjacency.get(nid, []):
+                if neighbor not in visited:
+                    next_frontier.add(neighbor)
         visited.update(next_frontier)
         frontier = next_frontier
         if not frontier:

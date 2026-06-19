@@ -14,7 +14,7 @@ import os
 import shutil
 import tempfile
 
-from polaroid import SceneEdge, SceneMerger, SceneNode, SceneQuery, SceneStore
+from polaroid import SceneEdge, SceneMerger, SceneNode, SceneStore
 
 # ---------------------------------------------------------------------------
 # Temporary database paths

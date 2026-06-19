@@ -18,36 +18,34 @@ from __future__ import annotations
 import sys
 from typing import Any
 
+try:
+    import mcp.server.stdio as _mcp_stdio
+    import mcp.types as _mcp_types
+    from mcp.server import Server as _Server
+    _HAS_MCP = True
+except ImportError:
+    _HAS_MCP = False
 
-def _require_mcp() -> Any:
-    try:
-        import mcp.server.stdio
-        import mcp.types as types
-        from mcp.server import Server as _Server
 
-        return mcp, types, _Server
-    except ImportError:
+def run_server() -> None:
+    """Start the MCP server on stdio."""
+    if not _HAS_MCP:
         print(
             "MCP server requires: pip install 'polaroid[mcp]'",
             file=sys.stderr,
         )
         sys.exit(1)
 
-
-def run_server() -> None:
-    """Start the MCP server on stdio."""
-    mcp_mod, types, server_cls = _require_mcp()
-
     from polaroid.graph import SceneNode
     from polaroid.query import SceneQuery
     from polaroid.store import SceneStore
 
-    server = server_cls("polaroid")
+    server = _Server("polaroid")
 
     @server.list_tools()
-    async def list_tools() -> list[types.Tool]:
+    async def list_tools() -> list[_mcp_types.Tool]:
         return [
-            types.Tool(
+            _mcp_types.Tool(
                 name="add_scene_node",
                 description="Add or update a node in the polaroid scene graph.",
                 inputSchema={
@@ -63,7 +61,7 @@ def run_server() -> None:
                     "required": ["label", "node_type"],
                 },
             ),
-            types.Tool(
+            _mcp_types.Tool(
                 name="query_nodes",
                 description="Query scene graph nodes by type, label, or confidence.",
                 inputSchema={
@@ -76,7 +74,7 @@ def run_server() -> None:
                     },
                 },
             ),
-            types.Tool(
+            _mcp_types.Tool(
                 name="get_context",
                 description="Get a text summary of the current scene graph.",
                 inputSchema={
@@ -92,7 +90,7 @@ def run_server() -> None:
     @server.call_tool()
     async def call_tool(
         name: str, arguments: dict[str, Any]
-    ) -> list[types.TextContent]:
+    ) -> list[_mcp_types.TextContent]:
         db = arguments.get("db", ".polaroid/scene.db")
 
         if name == "add_scene_node":
@@ -105,7 +103,7 @@ def run_server() -> None:
             )
             with SceneStore(db) as store:
                 store.upsert_node(node)
-            return [types.TextContent(type="text", text=f"Added node {node.id}: {node.label}")]
+            return [_mcp_types.TextContent(type="text", text=f"Added node {node.id}: {node.label}")]
 
         if name == "query_nodes":
             with SceneStore(db) as store:
@@ -116,20 +114,20 @@ def run_server() -> None:
                     min_confidence=arguments.get("min_confidence", 0.0),
                 )
             lines = [f"{n.label} ({n.node_type}, conf={n.confidence:.2f})" for n in nodes]
-            return [types.TextContent(type="text", text="\n".join(lines) or "No nodes found.")]
+            return [_mcp_types.TextContent(type="text", text="\n".join(lines) or "No nodes found.")]
 
         if name == "get_context":
             with SceneStore(db) as store:
                 q = SceneQuery(store)
                 summary = q.context_summary(agent_id=arguments.get("agent_id", ""))
-            return [types.TextContent(type="text", text=summary)]
+            return [_mcp_types.TextContent(type="text", text=summary)]
 
         raise ValueError(f"Unknown tool: {name}")
 
     import asyncio
 
     async def _main() -> None:
-        async with mcp_mod.server.stdio.stdio_server() as (read_stream, write_stream):
+        async with _mcp_stdio.stdio_server() as (read_stream, write_stream):
             await server.run(read_stream, write_stream, server.create_initialization_options())
 
     asyncio.run(_main())

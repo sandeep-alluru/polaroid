@@ -13,7 +13,6 @@ Exit 0 = all passed. Exit 1 = at least one failure.
 
 from __future__ import annotations
 
-import importlib
 import json
 import subprocess
 import sys
@@ -53,7 +52,7 @@ def section(title: str) -> None:
     print(f"\n{BOLD}{title}{RESET}")
 
 
-def run(name: str, fn):  # noqa: ANN001
+def run(name: str, fn):
     try:
         fn()
         ok(name)
@@ -74,7 +73,7 @@ def _test_import_version():
 
 
 def _test_import_public_api():
-    from polaroid import MergeResult, SceneEdge, SceneMerger, SceneNode, SceneQuery, SceneStore
+    from polaroid import SceneMerger, SceneQuery
     assert callable(SceneMerger)
     assert callable(SceneQuery)
 
@@ -129,13 +128,12 @@ def _test_edge_serialization():
 def _test_store_upsert_and_get():
     from polaroid.graph import SceneNode
     from polaroid.store import SceneStore
-    with tempfile.TemporaryDirectory() as tmp:
-        with SceneStore(f"{tmp}/scene.db") as s:
-            n = SceneNode(label="door-1", node_type="object", properties={})
-            s.upsert_node(n)
-            retrieved = s.get_node(n.id)
-            assert retrieved is not None
-            assert retrieved.label == "door-1"
+    with tempfile.TemporaryDirectory() as tmp, SceneStore(f"{tmp}/scene.db") as s:
+        n = SceneNode(label="door-1", node_type="object", properties={})
+        s.upsert_node(n)
+        retrieved = s.get_node(n.id)
+        assert retrieved is not None
+        assert retrieved.label == "door-1"
 
 
 def _test_store_confidence_upsert():
@@ -170,14 +168,13 @@ def _test_merger_adds_new_nodes():
     from polaroid.graph import SceneNode
     from polaroid.merger import SceneMerger
     from polaroid.store import SceneStore
-    with tempfile.TemporaryDirectory() as tmp:
-        with SceneStore(f"{tmp}/local.db") as local, \
+    with tempfile.TemporaryDirectory() as tmp, SceneStore(f"{tmp}/local.db") as local, \
              SceneStore(f"{tmp}/remote.db") as remote:
-            n = SceneNode(label="door-1", node_type="object", properties={})
-            remote.upsert_node(n)
-            result = SceneMerger().merge(local, remote)
-            assert len(result.added_nodes) == 1
-            assert local.get_node(n.id) is not None
+        n = SceneNode(label="door-1", node_type="object", properties={})
+        remote.upsert_node(n)
+        result = SceneMerger().merge(local, remote)
+        assert len(result.added_nodes) == 1
+        assert local.get_node(n.id) is not None
 
 
 def _test_merger_conflict_resolution():
@@ -202,48 +199,45 @@ def _test_merger_idempotent():
     from polaroid.graph import SceneNode
     from polaroid.merger import SceneMerger
     from polaroid.store import SceneStore
-    with tempfile.TemporaryDirectory() as tmp:
-        with SceneStore(f"{tmp}/local.db") as local, \
+    with tempfile.TemporaryDirectory() as tmp, SceneStore(f"{tmp}/local.db") as local, \
              SceneStore(f"{tmp}/remote.db") as remote:
-            n = SceneNode(label="x", node_type="object", properties={})
-            remote.upsert_node(n)
-            r1 = SceneMerger().merge(local, remote)
-            r2 = SceneMerger().merge(local, remote)
-            assert len(r1.added_nodes) == 1
-            assert len(r2.added_nodes) == 0
-            assert local.node_count() == 1
+        n = SceneNode(label="x", node_type="object", properties={})
+        remote.upsert_node(n)
+        r1 = SceneMerger().merge(local, remote)
+        r2 = SceneMerger().merge(local, remote)
+        assert len(r1.added_nodes) == 1
+        assert len(r2.added_nodes) == 0
+        assert local.node_count() == 1
 
 
 def _test_query_find_nodes():
     from polaroid.graph import SceneNode
     from polaroid.query import SceneQuery
     from polaroid.store import SceneStore
-    with tempfile.TemporaryDirectory() as tmp:
-        with SceneStore(f"{tmp}/scene.db") as s:
-            s.upsert_node(SceneNode(label="door-1", node_type="object", properties={}))
-            s.upsert_node(SceneNode(label="room-kitchen", node_type="room", properties={}))
-            q = SceneQuery(s)
-            objects = q.find_nodes(node_type="object")
-            assert len(objects) == 1
-            assert objects[0].label == "door-1"
+    with tempfile.TemporaryDirectory() as tmp, SceneStore(f"{tmp}/scene.db") as s:
+        s.upsert_node(SceneNode(label="door-1", node_type="object", properties={}))
+        s.upsert_node(SceneNode(label="room-kitchen", node_type="room", properties={}))
+        q = SceneQuery(s)
+        objects = q.find_nodes(node_type="object")
+        assert len(objects) == 1
+        assert objects[0].label == "door-1"
 
 
 def _test_query_context_summary():
     from polaroid.graph import SceneEdge, SceneNode
     from polaroid.query import SceneQuery
     from polaroid.store import SceneStore
-    with tempfile.TemporaryDirectory() as tmp:
-        with SceneStore(f"{tmp}/scene.db") as s:
-            n1 = SceneNode(label="room-kitchen", node_type="room", properties={})
-            n2 = SceneNode(label="table-A", node_type="object", properties={})
-            s.upsert_node(n1)
-            s.upsert_node(n2)
-            e = SceneEdge(source_id=n1.id, target_id=n2.id, relation="contains")
-            s.upsert_edge(e)
-            q = SceneQuery(s)
-            summary = q.context_summary()
-            assert "room" in summary.lower() or "object" in summary.lower()
-            assert "relationship" in summary or "relation" in summary
+    with tempfile.TemporaryDirectory() as tmp, SceneStore(f"{tmp}/scene.db") as s:
+        n1 = SceneNode(label="room-kitchen", node_type="room", properties={})
+        n2 = SceneNode(label="table-A", node_type="object", properties={})
+        s.upsert_node(n1)
+        s.upsert_node(n2)
+        e = SceneEdge(source_id=n1.id, target_id=n2.id, relation="contains")
+        s.upsert_edge(e)
+        q = SceneQuery(s)
+        summary = q.context_summary()
+        assert "room" in summary.lower() or "object" in summary.lower()
+        assert "relationship" in summary or "relation" in summary
 
 
 run("SceneMerger merges new nodes from remote", _test_merger_adds_new_nodes)
@@ -289,7 +283,9 @@ def _test_to_markdown():
 
 def _test_print_scene():
     import io
+
     from rich.console import Console
+
     from polaroid.graph import SceneNode
     from polaroid.report import print_scene
     buf = io.StringIO()
@@ -302,7 +298,9 @@ def _test_print_scene():
 
 def _test_print_merge():
     import io
+
     from rich.console import Console
+
     from polaroid.graph import MergeResult
     from polaroid.report import print_merge
     buf = io.StringIO()
@@ -377,6 +375,7 @@ def _test_api_import():
 
 def _test_api_health():
     from fastapi.testclient import TestClient
+
     from polaroid.api import app
     client = TestClient(app)
     r = client.get("/health")
@@ -387,6 +386,7 @@ def _test_api_health():
 
 def _test_api_node_and_context():
     from fastapi.testclient import TestClient
+
     from polaroid.api import app
     client = TestClient(app)
     with tempfile.TemporaryDirectory() as tmp:
@@ -410,6 +410,7 @@ def _test_api_node_and_context():
 
 def _test_api_merge():
     from fastapi.testclient import TestClient
+
     from polaroid.api import app
     from polaroid.graph import SceneNode
     client = TestClient(app)
@@ -501,7 +502,7 @@ run(".github/copilot-instructions.md exists", lambda: _check_file_nonempty(".git
 
 def _test_cursor_rules():
     mdc_files = list((REPO_ROOT / ".cursor/rules").glob("*.mdc"))
-    assert len(mdc_files) >= 1, f"Expected ≥1 .mdc file in .cursor/rules/, found none"
+    assert len(mdc_files) >= 1, "Expected ≥1 .mdc file in .cursor/rules/, found none"
 
 
 run(".cursor/rules/ has at least one .mdc file", _test_cursor_rules)

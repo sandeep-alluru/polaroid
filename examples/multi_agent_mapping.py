@@ -80,7 +80,7 @@ billing = page(store2, "Billing", {"nav_path": "Settings>Billing", "found_by": a
 nav(store2, settings, security_a2)
 nav(store2, settings, users)
 nav(store2, settings, billing)
-nav(store2, home.id and store2.get_node(home.id) or settings, settings)  # Settings reachable from home
+nav(store2, (home.id and store2.get_node(home.id)) or settings, settings)  # Settings reachable from home
 
 # Home may not be in store2 — add a stub just for the edge
 home_stub = page(store2, "Home", {"nav_path": "Home", "found_by": a2}, 0.8, a2)
@@ -149,8 +149,8 @@ assert security_merged is not None, "Security node missing from merged store"
 won_by = security_merged.properties.get("found_by", "unknown")
 won_confidence = security_merged.confidence
 print(
-    f"Security node conflict resolved: "
-    f"agent-004's version won (confidence 0.95 > 0.85)."
+    "Security node conflict resolved: "
+    "agent-004's version won (confidence 0.95 > 0.85)."
 )
 assert security_merged.properties.get("requires_2fa") is True, (
     "Expected agent-004's requires_2fa=True to be in merged Security node"

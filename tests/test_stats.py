@@ -1,8 +1,6 @@
 """Tests for polaroid.stats module."""
 from __future__ import annotations
 
-import pytest
-
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.stats import GraphStats, cluster_by_type, compute_stats, most_connected
 from polaroid.store import SceneStore
