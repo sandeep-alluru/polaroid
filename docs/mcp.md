@@ -5,7 +5,7 @@ polaroid ships an MCP server that exposes its core operations as native Claude t
 ## Install
 
 ```bash
-pip install "polaroid[mcp]"
+pip install "polaroid-ai[mcp]"
 ```
 
 ## Add to Claude Desktop

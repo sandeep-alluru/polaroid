@@ -1,7 +1,7 @@
 """FastAPI REST wrapper for polaroid.
 
 Start:   uvicorn polaroid.api:app --reload
-Install: pip install "polaroid[api]"
+Install: pip install "polaroid-ai[api]"
 Docs:    http://localhost:8000/docs
 """
 
@@ -14,7 +14,7 @@ try:
     from fastapi import FastAPI
     from pydantic import BaseModel, Field
 except ImportError as exc:
-    raise ImportError("API server requires: pip install 'polaroid[api]'") from exc
+    raise ImportError("API server requires: pip install 'polaroid-ai[api]'") from exc
 
 from polaroid import __version__
 from polaroid.graph import SceneEdge, SceneNode

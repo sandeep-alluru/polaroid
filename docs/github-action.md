@@ -14,7 +14,7 @@ Or use the CLI directly:
 
 ```yaml
 - name: Install polaroid
-  run: pip install polaroid
+  run: pip install polaroid-ai
 
 - name: Run polaroid
   run: polaroid --help

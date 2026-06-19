@@ -195,7 +195,7 @@ class WorldStateManager:
 
 ```bash
 # Install polaroid
-pip install polaroid
+pip install polaroid-ai
 
 # Build a small game world and query it
 python -c "

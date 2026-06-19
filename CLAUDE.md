@@ -12,7 +12,7 @@
 Read the research spec, then evaluate automerge-py vs py-crdt for the scene graph backend.
 
 ## MVP definition
-- `pip install polaroid` works
+- `pip install polaroid-ai` works
 - Embeddable spatiotemporal scene graph (nodes = physical entities, edges = spatial relationships)
 - CRDT-merged across multiple writers (no coordination overhead)
 - MQTT sensor adapter (paho-mqtt)

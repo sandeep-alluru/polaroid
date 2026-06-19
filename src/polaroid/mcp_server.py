@@ -31,7 +31,7 @@ def run_server() -> None:
     """Start the MCP server on stdio."""
     if not _HAS_MCP:
         print(
-            "MCP server requires: pip install 'polaroid[mcp]'",
+            "MCP server requires: pip install 'polaroid-ai[mcp]'",
             file=sys.stderr,
         )
         sys.exit(1)

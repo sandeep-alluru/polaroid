@@ -10,7 +10,7 @@ Set Padding 20
 Set PlaybackSpeed 1.0
 
 # Install
-Type "pip install polaroid" Sleep 500ms Enter
+Type "pip install polaroid-ai" Sleep 500ms Enter
 Sleep 2s
 Ctrl+L
 

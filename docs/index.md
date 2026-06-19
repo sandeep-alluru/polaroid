@@ -10,7 +10,7 @@
 ## Install
 
 ```bash
-pip install polaroid
+pip install polaroid-ai
 ```
 
 ## Quick example

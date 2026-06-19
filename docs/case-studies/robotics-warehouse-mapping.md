@@ -222,7 +222,7 @@ def fleet_map_health_report(robot_ids: list[str]) -> str:
 
 ```bash
 # Install polaroid
-pip install polaroid
+pip install polaroid-ai
 
 # Simulate two robots mapping the same area and merging
 python -c "
