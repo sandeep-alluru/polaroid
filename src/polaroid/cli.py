@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import click
 
+from polaroid.export import to_dot
+from polaroid.export import to_json as export_to_json
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.merger import SceneMerger
 from polaroid.query import SceneQuery
 from polaroid.report import print_merge, print_scene, to_json
+from polaroid.stats import compute_stats
 from polaroid.store import SceneStore
 
 
@@ -193,6 +196,49 @@ def status(ctx: click.Context) -> None:
         ec = store.edge_count()
         click.echo(f"Nodes: {nc}  Edges: {ec}")
         click.echo(summary)
+
+
+@main.command("stats")
+@click.pass_context
+def stats_cmd(ctx: click.Context) -> None:
+    """Show graph statistics for the scene store."""
+    with _store(ctx) as store:
+        s = compute_stats(store)
+        click.echo(f"Nodes:               {s.node_count}")
+        click.echo(f"Edges:               {s.edge_count}")
+        click.echo(f"Avg degree:          {s.avg_degree:.2f}")
+        click.echo(f"Max degree:          {s.max_degree}")
+        click.echo(f"Connected components:{s.connected_components}")
+        click.echo(f"Diameter:            {s.diameter}")
+        click.echo("Node types:")
+        for k in sorted(s.node_types):
+            click.echo(f"  {k}: {s.node_types[k]}")
+        click.echo("Edge relations:")
+        for k in sorted(s.edge_relations):
+            click.echo(f"  {k}: {s.edge_relations[k]}")
+
+
+@main.command("export")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["dot", "json"]),
+    default="json",
+    show_default=True,
+)
+@click.option("--output", "-o", default="-", help="Output file (default: stdout)")
+@click.pass_context
+def export_cmd(ctx: click.Context, fmt: str, output: str) -> None:
+    """Export the scene graph as DOT or JSON."""
+    with _store(ctx) as store:
+        content = to_dot(store) if fmt == "dot" else export_to_json(store)
+
+    if output == "-":
+        click.echo(content)
+    else:
+        with open(output, "w") as fh:
+            fh.write(content)
+        click.echo(f"Exported to {output}", err=True)
 
 
 if __name__ == "__main__":

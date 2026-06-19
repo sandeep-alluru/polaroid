@@ -183,3 +183,94 @@ def test_merge_command(tmp_path):
     runner = CliRunner()
     result = runner.invoke(main, ["--db", local_db, "merge", remote_db])
     assert result.exit_code == 0
+
+
+# ── stats ─────────────────────────────────────────────────────────────────────
+
+
+def test_stats_help():
+    runner = CliRunner()
+    result = runner.invoke(main, ["stats", "--help"])
+    assert result.exit_code == 0
+
+
+def test_stats_empty_store(db):
+    runner = CliRunner()
+    result = runner.invoke(main, ["--db", db, "stats"])
+    assert result.exit_code == 0
+    assert "Nodes:" in result.output
+    assert "Edges:" in result.output
+
+
+def test_stats_with_data(db):
+    runner = CliRunner()
+    runner.invoke(main, ["--db", db, "add-node", "kitchen", "room"])
+    runner.invoke(main, ["--db", db, "add-node", "table", "surface"])
+    result = runner.invoke(main, ["--db", db, "stats"])
+    assert result.exit_code == 0
+    assert "2" in result.output
+    assert "room" in result.output
+    assert "surface" in result.output
+
+
+def test_stats_shows_components_and_diameter(db):
+    runner = CliRunner()
+    runner.invoke(main, ["--db", db, "add-node", "A", "room"])
+    result = runner.invoke(main, ["--db", db, "stats"])
+    assert result.exit_code == 0
+    assert "Connected components" in result.output
+    assert "Diameter" in result.output
+
+
+# ── export ────────────────────────────────────────────────────────────────────
+
+
+def test_export_help():
+    runner = CliRunner()
+    result = runner.invoke(main, ["export", "--help"])
+    assert result.exit_code == 0
+
+
+def test_export_json_empty(db):
+    runner = CliRunner()
+    result = runner.invoke(main, ["--db", db, "export", "--format", "json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output.strip())
+    assert "nodes" in data
+    assert "edges" in data
+
+
+def test_export_json_with_data(db):
+    runner = CliRunner()
+    runner.invoke(main, ["--db", db, "add-node", "door", "object"])
+    result = runner.invoke(main, ["--db", db, "export", "--format", "json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output.strip())
+    assert data["node_count"] == 1
+
+
+def test_export_dot_format(db):
+    runner = CliRunner()
+    runner.invoke(main, ["--db", db, "add-node", "room-A", "room"])
+    result = runner.invoke(main, ["--db", db, "export", "--format", "dot"])
+    assert result.exit_code == 0
+    assert "digraph" in result.output
+
+
+def test_export_dot_empty(db):
+    runner = CliRunner()
+    result = runner.invoke(main, ["--db", db, "export", "--format", "dot"])
+    assert result.exit_code == 0
+    assert "digraph" in result.output
+
+
+def test_export_to_file(db, tmp_path):
+    out_file = str(tmp_path / "output.json")
+    runner = CliRunner()
+    runner.invoke(main, ["--db", db, "add-node", "x", "object"])
+    result = runner.invoke(main, ["--db", db, "export", "--format", "json", "-o", out_file])
+    assert result.exit_code == 0
+    import pathlib
+    content = pathlib.Path(out_file).read_text()
+    data = json.loads(content)
+    assert data["node_count"] == 1

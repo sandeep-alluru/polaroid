@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `export.py`: `to_dot()`, `to_json()`, `to_adjacency_matrix()` for scene graph export
+- `subgraph.py`: `extract_subgraph()`, `filter_by_type()`, `neighborhood()` for subgraph operations
+- `stats.py`: `GraphStats`, `compute_stats()`, `cluster_by_type()`, `most_connected()` for graph analytics
+- CLI commands: `polaroid stats` and `polaroid export --format dot|json`
+
 ## [0.1.0] - 2026-06-18
 
 ### Added
