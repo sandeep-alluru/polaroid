@@ -230,6 +230,15 @@ Endpoints: `GET /health`, `POST /node`, `POST /edge`, `GET /nodes`, `POST /merge
 
 ---
 
+## Case Studies
+
+See how teams are using polaroid in production:
+
+- [Conflict-Free Fleet Mapping for 60 Autonomous Warehouse Robots](docs/case-studies/robotics-warehouse-mapping.md)
+- [Persistent NPC World State for an AI-Driven Open-World RPG](docs/case-studies/game-ai-world-persistence.md)
+
+---
+
 ## Repository structure
 
 ```
