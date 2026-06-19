@@ -1,4 +1,5 @@
 """Graph statistics and clustering for scene stores."""
+
 from __future__ import annotations
 
 from collections import deque

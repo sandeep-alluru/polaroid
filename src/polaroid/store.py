@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
+from typing import Any
 
 from polaroid.graph import SceneEdge, SceneNode
 
@@ -87,9 +88,7 @@ class SceneStore:
 
     def get_node(self, node_id: str) -> SceneNode | None:
         """Return a SceneNode by ID, or None if not found."""
-        row = self._conn.execute(
-            "SELECT * FROM nodes WHERE id=?", (node_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM nodes WHERE id=?", (node_id,)).fetchone()
         if row is None:
             return None
         return self._row_to_node(row)
@@ -101,7 +100,7 @@ class SceneStore:
     ) -> list[SceneNode]:
         """Return nodes, optionally filtered by type and min confidence."""
         sql = "SELECT * FROM nodes WHERE confidence >= ?"
-        params: list = [min_confidence]
+        params: list[Any] = [min_confidence]
         if node_type is not None:
             sql += " AND node_type=?"
             params.append(node_type)
@@ -148,9 +147,7 @@ class SceneStore:
 
     def get_edge(self, edge_id: str) -> SceneEdge | None:
         """Return a SceneEdge by ID, or None if not found."""
-        row = self._conn.execute(
-            "SELECT * FROM edges WHERE id=?", (edge_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM edges WHERE id=?", (edge_id,)).fetchone()
         if row is None:
             return None
         return self._row_to_edge(row)
@@ -162,7 +159,7 @@ class SceneStore:
     ) -> list[SceneEdge]:
         """Return edges, optionally filtered by source_id and/or relation."""
         sql = "SELECT * FROM edges WHERE 1=1"
-        params: list = []
+        params: list[Any] = []
         if source_id is not None:
             sql += " AND source_id=?"
             params.append(source_id)

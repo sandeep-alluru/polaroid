@@ -22,6 +22,7 @@ try:
     import mcp.server.stdio as _mcp_stdio
     import mcp.types as _mcp_types
     from mcp.server import Server as _Server
+
     _HAS_MCP = True
 except ImportError:
     _HAS_MCP = False
@@ -88,9 +89,7 @@ def run_server() -> None:
         ]
 
     @server.call_tool()
-    async def call_tool(
-        name: str, arguments: dict[str, Any]
-    ) -> list[_mcp_types.TextContent]:
+    async def call_tool(name: str, arguments: dict[str, Any]) -> list[_mcp_types.TextContent]:
         db = arguments.get("db", ".polaroid/scene.db")
 
         if name == "add_scene_node":

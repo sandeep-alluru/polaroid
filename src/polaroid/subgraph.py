@@ -1,7 +1,9 @@
 """Subgraph extraction and neighborhood queries."""
+
 from __future__ import annotations
 
 from collections import deque
+from typing import Any
 
 from polaroid.store import SceneStore
 
@@ -11,9 +13,9 @@ def extract_subgraph(store: SceneStore, root_id: str, max_depth: int = 3) -> Sce
 
     Returns a new in-memory SceneStore.
     """
-    # Fetch all edges once upfront to avoid O(N×E) repeated queries inside the BFS loop.
+    # Fetch all edges once upfront to avoid O(NxE) repeated queries inside the BFS loop.
     all_edges = store.list_edges()
-    adjacency: dict[str, list] = {}
+    adjacency: dict[str, list[Any]] = {}
     for edge in all_edges:
         adjacency.setdefault(edge.source_id, []).append(edge)
 
@@ -62,7 +64,7 @@ def filter_by_type(store: SceneStore, node_types: list[str]) -> SceneStore:
 
 def neighborhood(store: SceneStore, node_id: str, radius: int = 1) -> list[str]:
     """Return all node IDs within `radius` hops of node_id."""
-    # Fetch all edges once upfront to avoid O(radius×E) repeated queries.
+    # Fetch all edges once upfront to avoid O(radiusxE) repeated queries.
     all_edges = store.list_edges()
     adjacency: dict[str, list[str]] = {}
     for edge in all_edges:

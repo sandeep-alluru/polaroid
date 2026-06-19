@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
@@ -115,7 +116,7 @@ def to_json(
     Returns:
         Indented JSON string.
     """
-    data: dict = {
+    data: dict[str, Any] = {
         "node_count": len(nodes),
         "nodes": [n.to_dict() for n in nodes],
     }
@@ -148,8 +149,7 @@ def to_markdown(nodes: list[SceneNode]) -> str:
     for node in nodes[:50]:
         agent = node.agent_id or "-"
         lines.append(
-            f"| `{node.id}` | {node.label} | {node.node_type} "
-            f"| {node.confidence:.2f} | {agent} |"
+            f"| `{node.id}` | {node.label} | {node.node_type} | {node.confidence:.2f} | {agent} |"
         )
 
     if len(nodes) > 50:

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import click
 
 from polaroid.export import to_dot
@@ -68,7 +70,7 @@ def add_node(
       polaroid add-node door-1 object --confidence 0.95 --property color=red
       polaroid add-node room-kitchen room
     """
-    props: dict = {}
+    props: dict[str, Any] = {}
     for kv in properties:
         if "=" in kv:
             k, v = kv.split("=", 1)

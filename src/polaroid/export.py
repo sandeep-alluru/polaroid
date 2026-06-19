@@ -1,4 +1,5 @@
 """Export scene graph to DOT, JSON, and adjacency matrix formats."""
+
 from __future__ import annotations
 
 import json
