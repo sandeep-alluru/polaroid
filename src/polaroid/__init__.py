@@ -12,7 +12,7 @@ from polaroid.stats import GraphStats, cluster_by_type, compute_stats, most_conn
 from polaroid.store import SceneStore
 from polaroid.subgraph import extract_subgraph, filter_by_type, neighborhood
 
-__version__ = _version("polaroid")
+__version__ = _version("polaroid-ai")
 
 __all__ = [
     "GraphStats",

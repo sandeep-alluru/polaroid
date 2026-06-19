@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Click CLI: `add-node`, `add-edge`, `query`, `merge`, `status`
 - FastAPI REST server (`/node`, `/edge`, `/nodes`, `/merge`, `/context`, `/health`)
 - MCP server with `add_scene_node`, `query_nodes`, `get_context` tools
-- 114 unit tests, 86% branch coverage
+- 202 unit tests, 86% branch coverage
 - `examples/demo.py` end-to-end demonstration
 
 [Unreleased]: https://github.com/sandeep-alluru/polaroid/compare/v0.1.0...HEAD

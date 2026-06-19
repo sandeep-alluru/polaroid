@@ -5,9 +5,9 @@
 ![polaroid](assets/hero.png)
 
 [![CI](https://github.com/sandeep-alluru/polaroid/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeep-alluru/polaroid/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/polaroid.svg)](https://pypi.org/project/polaroid/)
-[![Python 3.10+](https://img.shields.io/pypi/pyversions/polaroid.svg)](https://pypi.org/project/polaroid/)
-[![Downloads](https://img.shields.io/pypi/dm/polaroid.svg)](https://pypi.org/project/polaroid/)
+[![PyPI version](https://img.shields.io/pypi/v/polaroid-ai.svg)](https://pypi.org/project/polaroid-ai/)
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/polaroid-ai.svg)](https://pypi.org/project/polaroid-ai/)
+[![Downloads](https://img.shields.io/pypi/dm/polaroid-ai.svg)](https://pypi.org/project/polaroid-ai/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![codecov](https://codecov.io/gh/sandeep-alluru/polaroid/branch/main/graph/badge.svg)](https://codecov.io/gh/sandeep-alluru/polaroid)
 [![Typed](https://img.shields.io/badge/types-mypy-blue)](https://mypy-lang.org/)
@@ -63,14 +63,14 @@ flowchart LR
 | Offline / local-first | Single SQLite file, no server required |
 | FastAPI REST server | `/node`, `/edge`, `/nodes`, `/merge`, `/context` endpoints |
 | MCP server | Model Context Protocol integration for Claude and other agents |
-| 49 tests | Comprehensive test suite covering all layers |
+| 202 tests | Comprehensive test suite covering all layers |
 
 ---
 
 ## Quick Start
 
 ```bash
-pip install polaroid
+pip install polaroid-ai
 ```
 
 ```python
@@ -249,8 +249,11 @@ polaroid/
 │       ├── store.py          # SQLite-backed SceneStore
 │       ├── merger.py         # SceneMerger CRDT merge algorithm
 │       ├── query.py          # SceneQuery — find_nodes, find_neighbors, context_summary
+│       ├── export.py         # to_dot(), to_json(), to_adjacency_matrix() exporters
+│       ├── stats.py          # GraphStats, compute_stats(), cluster_by_type(), most_connected()
+│       ├── subgraph.py       # extract_subgraph(), filter_by_type(), neighborhood()
 │       ├── report.py         # print_scene(), print_merge(), to_json(), to_markdown()
-│       ├── cli.py            # Click CLI (add-node, add-edge, query, merge, status)
+│       ├── cli.py            # Click CLI (add-node, add-edge, query, merge, status, stats, export)
 │       ├── api.py            # FastAPI REST server
 │       └── mcp_server.py     # MCP server
 ├── tests/
@@ -258,6 +261,9 @@ polaroid/
 │   ├── test_store.py         # SceneStore upsert/get/list tests
 │   ├── test_merger.py        # SceneMerger CRDT merge tests
 │   ├── test_query.py         # SceneQuery tests
+│   ├── test_export.py        # Export formatter tests
+│   ├── test_stats.py         # Graph analytics tests
+│   ├── test_subgraph.py      # Subgraph extraction tests
 │   ├── test_report.py        # Report formatter tests
 │   ├── test_cli_runner.py    # Click CliRunner tests
 │   └── test_api.py           # FastAPI TestClient tests
@@ -273,6 +279,77 @@ polaroid/
 ├── openapi.yaml              # OpenAPI 3.1 spec
 ├── pyproject.toml            # Package metadata + dependencies
 └── CONTRIBUTING.md           # Contribution guide
+```
+
+---
+
+## Advanced API
+
+These functions are exported at the top level (`from polaroid import ...`) and cover graph analytics, DOT export, and subgraph extraction.
+
+### `compute_stats(store) -> GraphStats`
+
+Returns aggregate statistics about a `SceneStore`.
+
+```python
+from polaroid import SceneStore, compute_stats
+
+store = SceneStore("/tmp/scene.db")
+stats = compute_stats(store)
+print(stats.node_count)          # total nodes
+print(stats.edge_count)          # total edges
+print(stats.avg_confidence)      # mean confidence across all nodes
+print(stats.most_common_type)    # node type with the highest count
+```
+
+### `to_dot(store) -> str`
+
+Serialises the scene graph as a Graphviz DOT string, ready for rendering with `dot -Tpng`.
+
+```python
+from polaroid import SceneStore, to_dot
+
+store = SceneStore("/tmp/scene.db")
+dot_src = to_dot(store)
+print(dot_src)
+# digraph polaroid {
+#   "abc123" [label="kitchen (room)"];
+#   "def456" [label="table-A (object)"];
+#   "abc123" -> "def456" [label="contains"];
+# }
+
+with open("scene.dot", "w") as f:
+    f.write(dot_src)
+# Then: dot -Tpng scene.dot -o scene.png
+```
+
+### `extract_subgraph(store, node_ids) -> SceneStore` (in-memory)
+
+Returns a new in-memory `SceneStore` containing only the specified nodes and the edges that connect them.
+
+```python
+from polaroid import SceneStore, SceneNode, extract_subgraph
+
+store = SceneStore("/tmp/scene.db")
+# Get IDs of interest from a query, then extract
+kitchen = SceneNode(label="room-kitchen", node_type="room")
+table   = SceneNode(label="table-A",      node_type="object")
+sub = extract_subgraph(store, [kitchen.id, table.id])
+print(sub.list_nodes())   # only kitchen + table
+```
+
+### `neighborhood(store, node_id, radius=1) -> list[SceneNode]`
+
+Returns all nodes reachable from `node_id` within `radius` hops (BFS over edges). Useful for building local context windows for LLM prompts.
+
+```python
+from polaroid import SceneStore, SceneNode, neighborhood
+
+store = SceneStore("/tmp/scene.db")
+kitchen = SceneNode(label="room-kitchen", node_type="room")
+nearby = neighborhood(store, kitchen.id, radius=2)
+for node in nearby:
+    print(node.label, node.node_type)
 ```
 
 ---
