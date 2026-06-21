@@ -173,45 +173,46 @@ def demo_polaroid(tmp: Path) -> None:
     print(f"     Combined node count: {store_a.node_count()}")
     print(f"     Combined edge count: {store_a.edge_count()}")
 
-    # Verify Room-102: Robot-A's higher confidence (0.95) must be kept
-    unified_room_102 = store_a.get_node(room_102.id)
-    assert unified_room_102 is not None, "Room-102 missing from merged store"
-    assert unified_room_102.confidence == 0.95, (
-        f"Expected Room-102 confidence=0.95 (Robot-A wins), "
-        f"got {unified_room_102.confidence}"
-    )
-    print(
-        f"     CRDT verification: Room-102 confidence = {unified_room_102.confidence:.2f} "
-        f"(Robot-A's higher-confidence scan wins)"
-    )
+    try:
+        # Verify Room-102: Robot-A's higher confidence (0.95) must be kept
+        unified_room_102 = store_a.get_node(room_102.id)
+        assert unified_room_102 is not None, "Room-102 missing from merged store"
+        assert unified_room_102.confidence == 0.95, (
+            f"Expected Room-102 confidence=0.95 (Robot-A wins), "
+            f"got {unified_room_102.confidence}"
+        )
+        print(
+            f"     CRDT verification: Room-102 confidence = {unified_room_102.confidence:.2f} "
+            f"(Robot-A's higher-confidence scan wins)"
+        )
 
-    # ── Query the unified scene ──────────────────────────────────────────────
-    _step("Querying the unified scene graph")
+        # ── Query the unified scene ──────────────────────────────────────────────
+        _step("Querying the unified scene graph")
 
-    q = SceneQuery(store_a)
+        q = SceneQuery(store_a)
 
-    all_rooms = q.find_nodes(node_type="room")
-    corridors = q.find_nodes(node_type="corridor")
-    print(f"     Rooms in unified map ({len(all_rooms)}): "
-          f"{', '.join(n.label for n in all_rooms)}")
-    print(f"     Corridors: {', '.join(n.label for n in corridors)}")
+        all_rooms = q.find_nodes(node_type="room")
+        corridors = q.find_nodes(node_type="corridor")
+        print(f"     Rooms in unified map ({len(all_rooms)}): "
+              f"{', '.join(n.label for n in all_rooms)}")
+        print(f"     Corridors: {', '.join(n.label for n in corridors)}")
 
-    neighbors = q.find_neighbors(hallway_north.id, relation="connects")
-    print(
-        f"     Hallway-North connects to: "
-        f"{', '.join(n.label for n in neighbors)}"
-    )
+        neighbors = q.find_neighbors(hallway_north.id, relation="connects")
+        print(
+            f"     Hallway-North connects to: "
+            f"{', '.join(n.label for n in neighbors)}"
+        )
 
-    print(f"     Context: {q.context_summary()}")
+        print(f"     Context: {q.context_summary()}")
 
-    # Confirm 5 unique locations (3 from A + 2 new from B; Room-102 deduped)
-    assert store_a.node_count() == 5, (
-        f"Expected 5 unique locations after merge, got {store_a.node_count()}"
-    )
-    print("     Assertion passed: 5 unique locations in combined map")
-
-    store_a.close()
-    store_b.close()
+        # Confirm 5 unique locations (3 from A + 2 new from B; Room-102 deduped)
+        assert store_a.node_count() == 5, (
+            f"Expected 5 unique locations after merge, got {store_a.node_count()}"
+        )
+        print("     Assertion passed: 5 unique locations in combined map")
+    finally:
+        store_a.close()
+        store_b.close()
 
 
 # ---------------------------------------------------------------------------
@@ -479,30 +480,31 @@ def demo_groundcrew(tmp: Path) -> None:
     _step("Saving ActionReceipt to ReceiptStore for audit trail")
 
     receipt_store = ReceiptStore(str(receipt_db))
-    receipt_store.save(receipt)
+    try:
+        receipt_store.save(receipt)
 
-    retrieved = receipt_store.get(receipt.id)
-    assert retrieved is not None, "Receipt not found in store after save"
-    assert retrieved.id == receipt.id, "Retrieved receipt ID mismatch"
-    assert retrieved.spec.verb == "deliver", "Spec verb not preserved on round-trip"
-    assert retrieved.spec.target == "Room-101", "Spec target not preserved on round-trip"
+        retrieved = receipt_store.get(receipt.id)
+        assert retrieved is not None, "Receipt not found in store after save"
+        assert retrieved.id == receipt.id, "Retrieved receipt ID mismatch"
+        assert retrieved.spec.verb == "deliver", "Spec verb not preserved on round-trip"
+        assert retrieved.spec.target == "Room-101", "Spec target not preserved on round-trip"
 
-    print(f"     Saved and retrieved receipt {retrieved.id}")
-    print(
-        f"     Stored spec: verb='{retrieved.spec.verb}', "
-        f"target='{retrieved.spec.target}'"
-    )
-    print(
-        f"     Params round-tripped: "
-        f"robot_id='{retrieved.spec.params['robot_id']}', "
-        f"item='{retrieved.spec.params['item']}'"
-    )
+        print(f"     Saved and retrieved receipt {retrieved.id}")
+        print(
+            f"     Stored spec: verb='{retrieved.spec.verb}', "
+            f"target='{retrieved.spec.target}'"
+        )
+        print(
+            f"     Params round-tripped: "
+            f"robot_id='{retrieved.spec.params['robot_id']}', "
+            f"item='{retrieved.spec.params['item']}'"
+        )
 
-    all_receipts = receipt_store.list_receipts()
-    print(f"     Total receipts in audit store: {len(all_receipts)}")
-    assert len(all_receipts) == 1, "Expected exactly 1 receipt in store"
-
-    receipt_store.close()
+        all_receipts = receipt_store.list_receipts()
+        print(f"     Total receipts in audit store: {len(all_receipts)}")
+        assert len(all_receipts) == 1, "Expected exactly 1 receipt in store"
+    finally:
+        receipt_store.close()
 
     print("\n     Audit summary:")
     print(f"       Action : {retrieved.spec.verb} {retrieved.spec.target}")
