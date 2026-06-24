@@ -1,18 +1,10 @@
-name: polaroid
-displayName: "Polaroid"
-description: "Embeddable CRDT scene graph — shared spatial memory for embodied AI agents"
-license: MIT
-homepage: https://github.com/sandeep-alluru/polaroid
-repository: https://github.com/sandeep-alluru/polaroid
-keywords:
-  - ai-agents
-  - crdt
-  - scene-graph
-  - mcp
 startCommand:
   type: stdio
   configSchema:
     type: object
     properties: {}
   commandFunction: |-
-    (config) => ({ command: "python", args: ["-m", "polaroid.mcp_server"] })
+    (config) => ({
+      command: 'uvx',
+      args: ['polaroid-mcp']
+    })
