@@ -1,4 +1,5 @@
 """Tests for polaroid.export module."""
+
 from __future__ import annotations
 
 import json
@@ -13,7 +14,9 @@ def _node(label: str, node_type: str, confidence: float = 1.0) -> SceneNode:
 
 
 def _edge(source_id: str, target_id: str, relation: str, confidence: float = 1.0) -> SceneEdge:
-    return SceneEdge(source_id=source_id, target_id=target_id, relation=relation, confidence=confidence)
+    return SceneEdge(
+        source_id=source_id, target_id=target_id, relation=relation, confidence=confidence
+    )
 
 
 def make_store() -> SceneStore:
@@ -68,9 +71,9 @@ class TestToDot:
     def test_node_colors_by_type(self) -> None:
         with make_store() as store:
             result = to_dot(store)
-        assert "lightyellow" in result   # room
-        assert "lightgreen" in result    # surface
-        assert "lightblue" in result     # object
+        assert "lightyellow" in result  # room
+        assert "lightgreen" in result  # surface
+        assert "lightblue" in result  # object
 
     def test_default_color_for_unknown_type(self) -> None:
         store = SceneStore(":memory:")

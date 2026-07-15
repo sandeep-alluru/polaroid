@@ -1,4 +1,5 @@
 """Tests for polaroid.subgraph module."""
+
 from __future__ import annotations
 
 from polaroid.graph import SceneEdge, SceneNode
@@ -43,7 +44,7 @@ class TestExtractSubgraph:
         assert nd.id in node_ids
 
     def test_max_depth_zero_only_root(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         with extract_subgraph(store, na.id, max_depth=0) as sub:
             node_ids = {n.id for n in sub.list_nodes()}
         store.close()
@@ -70,7 +71,7 @@ class TestExtractSubgraph:
         assert nd.id not in node_ids
 
     def test_edges_are_copied(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, nb, _nc, _nd = make_chain_store()
         with extract_subgraph(store, na.id, max_depth=1) as sub:
             edges = sub.list_edges()
         store.close()
@@ -80,7 +81,7 @@ class TestExtractSubgraph:
         assert edges[0].target_id == nb.id
 
     def test_edges_both_endpoints_in_subgraph(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         with extract_subgraph(store, na.id, max_depth=3) as sub:
             edges = sub.list_edges()
             node_ids = {n.id for n in sub.list_nodes()}
@@ -90,7 +91,7 @@ class TestExtractSubgraph:
             assert edge.target_id in node_ids
 
     def test_unreachable_node_excluded(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         # Add a disconnected node
         isolated = _node("isolated", "agent")
         store.upsert_node(isolated)
@@ -100,7 +101,7 @@ class TestExtractSubgraph:
         assert isolated.id not in node_ids
 
     def test_returns_scene_store(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         sub = extract_subgraph(store, na.id)
         assert isinstance(sub, SceneStore)
         sub.close()
@@ -115,7 +116,7 @@ class TestExtractSubgraph:
 
 class TestFilterByType:
     def test_only_specified_types(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         with filter_by_type(store, ["room", "object"]) as sub:
             nodes = sub.list_nodes()
             types = {n.node_type for n in nodes}
@@ -123,14 +124,14 @@ class TestFilterByType:
         assert types == {"room", "object"}
 
     def test_excludes_other_types(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         with filter_by_type(store, ["room"]) as sub:
             nodes = sub.list_nodes()
         store.close()
         assert all(n.node_type == "room" for n in nodes)
 
     def test_edges_between_filtered_nodes(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         # A(room) -> B(object): both kept; B->C edge not kept (C is surface)
         with filter_by_type(store, ["room", "object"]) as sub:
             edges = sub.list_edges()
@@ -141,7 +142,7 @@ class TestFilterByType:
             assert edge.target_id in node_ids
 
     def test_no_cross_type_edges(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         # Only room type: A alone, no edges
         with filter_by_type(store, ["room"]) as sub:
             edges = sub.list_edges()
@@ -149,7 +150,7 @@ class TestFilterByType:
         assert edges == []
 
     def test_empty_types_list(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         with filter_by_type(store, []) as sub:
             assert sub.node_count() == 0
             assert sub.edge_count() == 0
@@ -162,7 +163,7 @@ class TestFilterByType:
         store.close()
 
     def test_returns_scene_store(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, _na, _nb, _nc, _nd = make_chain_store()
         sub = filter_by_type(store, ["room"])
         assert isinstance(sub, SceneStore)
         sub.close()
@@ -171,14 +172,14 @@ class TestFilterByType:
 
 class TestNeighborhood:
     def test_direct_neighbors(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, nb, _nc, _nd = make_chain_store()
         result = neighborhood(store, na.id, radius=1)
         store.close()
         assert nb.id in result
         assert na.id not in result  # root excluded
 
     def test_radius_one_not_two_hops(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, nc, _nd = make_chain_store()
         result = neighborhood(store, na.id, radius=1)
         store.close()
         assert nc.id not in result
@@ -192,13 +193,13 @@ class TestNeighborhood:
         assert nd.id not in result
 
     def test_radius_three(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, nd = make_chain_store()
         result = neighborhood(store, na.id, radius=3)
         store.close()
         assert nd.id in result
 
     def test_excludes_root_itself(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         result = neighborhood(store, na.id, radius=5)
         store.close()
         assert na.id not in result
@@ -218,7 +219,7 @@ class TestNeighborhood:
         assert result == []
 
     def test_returns_list(self) -> None:
-        store, na, nb, nc, nd = make_chain_store()
+        store, na, _nb, _nc, _nd = make_chain_store()
         result = neighborhood(store, na.id)
         store.close()
         assert isinstance(result, list)

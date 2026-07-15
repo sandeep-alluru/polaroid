@@ -92,12 +92,8 @@ def test_merge_keeps_local_when_higher_confidence(local, remote):
 
 
 def test_merge_equal_confidence_keeps_local(local, remote):
-    n_local = SceneNode(
-        label="x", node_type="object", properties={"v": "local"}, confidence=0.5
-    )
-    n_remote = SceneNode(
-        label="x", node_type="object", properties={"v": "remote"}, confidence=0.5
-    )
+    n_local = SceneNode(label="x", node_type="object", properties={"v": "local"}, confidence=0.5)
+    n_remote = SceneNode(label="x", node_type="object", properties={"v": "remote"}, confidence=0.5)
     local.upsert_node(n_local)
     remote.upsert_node(n_remote)
     result = SceneMerger().merge(local, remote)

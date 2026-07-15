@@ -271,6 +271,7 @@ def test_export_to_file(db, tmp_path):
     result = runner.invoke(main, ["--db", db, "export", "--format", "json", "-o", out_file])
     assert result.exit_code == 0
     import pathlib
+
     content = pathlib.Path(out_file).read_text()
     data = json.loads(content)
     assert data["node_count"] == 1

@@ -1,4 +1,5 @@
 """Tests for polaroid.stats module."""
+
 from __future__ import annotations
 
 from polaroid.graph import SceneEdge, SceneNode
@@ -54,25 +55,25 @@ class TestComputeStats:
         assert s.diameter == 0
 
     def test_node_count(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.node_count == 3
 
     def test_edge_count(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.edge_count == 2
 
     def test_node_types(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.node_types == {"room": 1, "object": 1, "surface": 1}
 
     def test_edge_relations(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.edge_relations == {"contains": 1, "has": 1}
@@ -80,19 +81,19 @@ class TestComputeStats:
     def test_avg_degree_chain(self) -> None:
         # Chain A->B->C: A has degree 1, B has degree 2 (A->B and B->C), C has degree 1
         # total = 4, avg = 4/3
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert abs(s.avg_degree - 4 / 3) < 1e-9
 
     def test_max_degree(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.max_degree == 2  # B is endpoint of both edges
 
     def test_connected_components_connected(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.connected_components == 1
@@ -108,7 +109,7 @@ class TestComputeStats:
         assert s.connected_components == 2
 
     def test_diameter_chain_of_three(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         s = compute_stats(store)
         store.close()
         assert s.diameter == 2
@@ -204,7 +205,7 @@ class TestClusterByType:
 
 class TestMostConnected:
     def test_sorted_by_degree_desc(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         result = most_connected(store)
         store.close()
         degrees = [deg for _, deg in result]
@@ -212,20 +213,20 @@ class TestMostConnected:
 
     def test_most_connected_node(self) -> None:
         # B is endpoint of both edges: degree=2, A and C have degree=1
-        store, na, nb, nc = make_simple_store()
+        store, _na, nb, _nc = make_simple_store()
         result = most_connected(store, n=1)
         store.close()
         assert result[0][0] == nb.id
         assert result[0][1] == 2
 
     def test_top_n_limit(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         result = most_connected(store, n=2)
         store.close()
         assert len(result) == 2
 
     def test_n_larger_than_nodes(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         result = most_connected(store, n=100)
         store.close()
         assert len(result) == 3
@@ -237,7 +238,7 @@ class TestMostConnected:
         assert result == []
 
     def test_returns_list_of_tuples(self) -> None:
-        store, na, nb, nc = make_simple_store()
+        store, _na, _nb, _nc = make_simple_store()
         result = most_connected(store)
         store.close()
         assert isinstance(result, list)
