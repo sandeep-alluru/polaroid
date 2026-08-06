@@ -1,6 +1,6 @@
 # Closed loop — `polaroid`
 
-**Status:** stub (eagle-eyes Phase 0 / 2026-08-04)  
+**Status:** reader wired (eagle-eyes / 2026-08-06) — **DETACHED-PART / EMPTY-SCENE**  
 **Owner loop:** Embodied only
 
 ## Load-bearing job
@@ -9,11 +9,14 @@ CRDT spatial scene graph for embodied agents
 
 ## Who reads the output?
 
-Peer agents merge scene; navigation uses graph
+- `gate_scene` / `gate_attachment` / `gate_navigable`
+- Peer agents merge scene; navigation uses graph **after** gate
 
 ## What outcome changes?
 
-Shared map without central server
+Empty map → FAIL_LOUD. Detached parts without weld edges → FAIL.
+Disconnected multi-room maps → FAIL. Shared map without central server when
+structure is real.
 
 ## When NOT to use (anti-ornament)
 
@@ -21,9 +24,9 @@ Not for non-spatial content pipelines
 
 ## Non-Ornament checklist
 
-- [ ] Reader implemented in CI, gate, or eagle-eyes script
-- [ ] Empty/wrong output fails loudly
-- [ ] Not exposed as free MCP in product agents
+- [x] Reader implemented (`closed_loop.gate_scene` + attachment/nav)
+- [x] Empty/wrong output fails loudly
+- [x] Not free MCP without gate
 - [ ] Linked gap IDs in mem0 when improving
 
 ## Related failures (farm memory)
