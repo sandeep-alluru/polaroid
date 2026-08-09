@@ -17,8 +17,10 @@ def client():
 
 
 @pytest.fixture
-def db(tmp_path):
-    return str(tmp_path / "scene.db")
+def db(tmp_path, monkeypatch):
+    """Confine API db paths under the test tmp dir (path-injection root)."""
+    monkeypatch.setenv("POLAROID_DATA_DIR", str(tmp_path))
+    return "scene.db"
 
 
 # ── /health ───────────────────────────────────────────────────────────────────
@@ -28,6 +30,21 @@ def test_health_returns_ok(client):
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json()["status"] == "ok"
+
+
+def test_path_injection_rejected(client, db, monkeypatch, tmp_path):
+    """CodeQL py/path-injection: user db must not escape data root."""
+    monkeypatch.setenv("POLAROID_DATA_DIR", str(tmp_path))
+    r = client.post(
+        "/node",
+        json={
+            "label": "x",
+            "node_type": "object",
+            "db": "../../../etc/passwd",
+        },
+    )
+    assert r.status_code == 400
+    assert "escapes" in r.json()["detail"].lower() or "data root" in r.json()["detail"].lower()
 
 
 def test_health_returns_version(client):

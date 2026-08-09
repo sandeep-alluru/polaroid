@@ -11,8 +11,9 @@ from polaroid.cli import main
 
 
 @pytest.fixture
-def db(tmp_path):
-    return str(tmp_path / "scene.db")
+def db(tmp_path, monkeypatch):
+    monkeypatch.setenv("POLAROID_DATA_DIR", str(tmp_path))
+    return "scene.db"
 
 
 # ── --help ────────────────────────────────────────────────────────────────────
@@ -169,14 +170,15 @@ def test_status_with_data(db):
 # ── merge ─────────────────────────────────────────────────────────────────────
 
 
-def test_merge_command(tmp_path):
+def test_merge_command(tmp_path, monkeypatch):
     from polaroid.graph import SceneNode
     from polaroid.store import SceneStore
 
-    local_db = str(tmp_path / "local.db")
-    remote_db = str(tmp_path / "remote.db")
+    monkeypatch.setenv("POLAROID_DATA_DIR", str(tmp_path))
+    local_db = "local.db"
+    remote_db = "remote.db"
 
-    with SceneStore(remote_db) as remote:
+    with SceneStore(remote_db, data_root=tmp_path) as remote:
         n = SceneNode(label="peer-node", node_type="object", properties={})
         remote.upsert_node(n)
 

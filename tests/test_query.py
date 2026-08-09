@@ -12,7 +12,7 @@ from polaroid.store import SceneStore
 @pytest.fixture
 def populated_store(tmp_path):
     """A store with a small scene: 2 rooms, 3 objects, 2 edges."""
-    s = SceneStore(str(tmp_path / "scene.db"))
+    s = SceneStore(str(tmp_path / "scene.db"), data_root=tmp_path)
     kitchen = SceneNode(label="room-kitchen", node_type="room", properties={})
     lounge = SceneNode(label="room-lounge", node_type="room", properties={})
     table = SceneNode(
@@ -157,7 +157,7 @@ def test_context_summary_mentions_edges(populated_store):
 
 
 def test_context_summary_empty_store(tmp_path):
-    with SceneStore(str(tmp_path / "empty.db")) as s:
+    with SceneStore(str(tmp_path / "empty.db"), data_root=tmp_path) as s:
         q = SceneQuery(s)
         summary = q.context_summary()
         assert "empty" in summary.lower() or "no node" in summary.lower()

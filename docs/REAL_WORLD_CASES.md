@@ -39,6 +39,26 @@ this cycle.
 **Non-Ornament:** Call `gate_scene` before merge/nav; weld parts with real
 edges, not only property strings.
 
+## Case PATH-INJECTION (CodeQL py/path-injection) — HIGH
+
+**Source:** GitHub Code Scanning alert
+https://github.com/sandeep-alluru/polaroid/security/code-scanning/1
+
+**What failed:** REST/MCP `db` query/body fields were passed straight into
+`SceneStore(path)` → `Path(path).parent.mkdir` / `sqlite3.connect`, so a caller
+could open or create files outside the intended data directory
+(`../../../etc/passwd` class).
+
+**Product fix:**
+
+| Control | API |
+|---------|-----|
+| Path confine | `safe_db_path` / `POLAROID_DATA_DIR` (default `.polaroid`) |
+| Store gate | `SceneStore(..., data_root=)` rejects escapes (`PathEscapeError`) |
+| HTTP | API maps escape → **400** |
+
+**Tests:** `tests/test_path_injection.py`
+
 ---
 
 ## Related IDs

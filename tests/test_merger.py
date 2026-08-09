@@ -11,14 +11,14 @@ from polaroid.store import SceneStore
 
 @pytest.fixture
 def local(tmp_path):
-    s = SceneStore(str(tmp_path / "local.db"))
+    s = SceneStore(str(tmp_path / "local.db"), data_root=tmp_path)
     yield s
     s.close()
 
 
 @pytest.fixture
 def remote(tmp_path):
-    s = SceneStore(str(tmp_path / "remote.db"))
+    s = SceneStore(str(tmp_path / "remote.db"), data_root=tmp_path)
     yield s
     s.close()
 

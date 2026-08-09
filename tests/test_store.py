@@ -10,14 +10,14 @@ from polaroid.store import SceneStore
 
 def test_store_creates_file(tmp_path):
     db = tmp_path / "scene.db"
-    s = SceneStore(str(db))
+    s = SceneStore(str(db), data_root=tmp_path)
     s.close()
     assert db.exists()
 
 
 def test_store_creates_parent_dirs(tmp_path):
     db = tmp_path / "subdir" / "nested" / "scene.db"
-    s = SceneStore(str(db))
+    s = SceneStore(str(db), data_root=tmp_path)
     s.close()
     assert db.exists()
 
@@ -180,7 +180,7 @@ def test_edge_count(store):
 
 
 def test_store_context_manager(tmp_path):
-    with SceneStore(str(tmp_path / "scene.db")) as s:
+    with SceneStore(str(tmp_path / "scene.db"), data_root=tmp_path) as s:
         n = SceneNode(label="x", node_type="object", properties={})
         s.upsert_node(n)
         assert s.node_count() == 1

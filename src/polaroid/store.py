@@ -8,18 +8,39 @@ from pathlib import Path
 from typing import Any
 
 from polaroid.graph import SceneEdge, SceneNode
+from polaroid.paths import MEMORY_URI, safe_db_path
 
 
 class SceneStore:
     """SQLite-backed persistent store for scene nodes and edges.
 
     All writes are immediately committed. One SceneStore per process.
+
+    Paths are confined to a data root (default ``.polaroid`` or
+    ``POLAROID_DATA_DIR``) to prevent path-injection from API/MCP callers
+    (CWE-22 / CodeQL ``py/path-injection``).
     """
 
-    def __init__(self, path: str | Path) -> None:
-        self._path = Path(path)
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self._path))
+    def __init__(self, path: str | Path, *, data_root: str | Path | None = None) -> None:
+        """Open or create a store at *path*.
+
+        Parameters
+        ----------
+        path:
+            Store path or ``":memory:"``. Relative paths are resolved under
+            *data_root*. Absolute paths must stay inside *data_root*.
+        data_root:
+            Optional root directory (defaults to env ``POLAROID_DATA_DIR`` or
+            ``.polaroid``). Tests should pass the pytest ``tmp_path``.
+        """
+        resolved = safe_db_path(path, root=data_root)
+        if resolved == MEMORY_URI:
+            self._path = Path(MEMORY_URI)
+            self._conn = sqlite3.connect(MEMORY_URI)
+        else:
+            self._path = Path(resolved)
+            self._path.parent.mkdir(parents=True, exist_ok=True)
+            self._conn = sqlite3.connect(str(self._path))
         self._conn.row_factory = sqlite3.Row
         self._create_schema()
 

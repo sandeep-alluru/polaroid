@@ -7,11 +7,10 @@ Docs:    http://localhost:8000/docs
 
 from __future__ import annotations
 
-import tempfile
 from typing import Any
 
 try:
-    from fastapi import FastAPI
+    from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel, Field
 except ImportError as exc:
     raise ImportError("API server requires: pip install 'polaroid-ai[api]'") from exc
@@ -19,8 +18,18 @@ except ImportError as exc:
 from polaroid import __version__
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.merger import SceneMerger
+from polaroid.paths import PathEscapeError
 from polaroid.query import SceneQuery
 from polaroid.store import SceneStore
+
+
+def _store(db: str) -> SceneStore:
+    """Open a store or map path escape to HTTP 400."""
+    try:
+        return SceneStore(db)
+    except PathEscapeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
 
 app = FastAPI(
     title="polaroid API",
@@ -87,7 +96,7 @@ async def add_node(request: NodeRequest) -> Any:
         confidence=request.confidence,
         agent_id=request.agent_id,
     )
-    with SceneStore(request.db) as store:
+    with _store(request.db) as store:
         store.upsert_node(node)
     return node.to_dict()
 
@@ -101,7 +110,7 @@ async def add_edge(request: EdgeRequest) -> Any:
         relation=request.relation,
         confidence=request.confidence,
     )
-    with SceneStore(request.db) as store:
+    with _store(request.db) as store:
         store.upsert_edge(edge)
     return edge.to_dict()
 
@@ -113,7 +122,7 @@ async def list_nodes(
     db: str = _DEFAULT_DB,
 ) -> Any:
     """List nodes with optional filters."""
-    with SceneStore(db) as store:
+    with _store(db) as store:
         nodes = store.list_nodes(node_type=node_type, min_confidence=min_confidence)
     return {"nodes": [n.to_dict() for n in nodes], "count": len(nodes)}
 
@@ -121,17 +130,13 @@ async def list_nodes(
 @app.post("/merge")
 async def merge(request: MergeRequest) -> Any:
     """Merge a set of nodes and edges into the local store."""
-    with SceneStore(request.db) as local:
-        # Build a temporary in-memory remote store
-        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
-            tmp_path = f.name
-
-        with SceneStore(tmp_path) as remote:
-            for nd in request.other_nodes:
-                remote.upsert_node(SceneNode.from_dict(nd))
-            for ed in request.other_edges:
-                remote.upsert_edge(SceneEdge.from_dict(ed))
-            result = SceneMerger().merge(local, remote)
+    # Remote side is in-memory only (not user path-controlled).
+    with _store(request.db) as local, SceneStore(":memory:") as remote:
+        for nd in request.other_nodes:
+            remote.upsert_node(SceneNode.from_dict(nd))
+        for ed in request.other_edges:
+            remote.upsert_edge(SceneEdge.from_dict(ed))
+        result = SceneMerger().merge(local, remote)
 
     return result.to_dict()
 
@@ -139,7 +144,7 @@ async def merge(request: MergeRequest) -> Any:
 @app.get("/context")
 async def context_summary(agent_id: str = "", db: str = _DEFAULT_DB) -> Any:
     """Return a text description of the current scene."""
-    with SceneStore(db) as store:
+    with _store(db) as store:
         q = SceneQuery(store)
         summary = q.context_summary(agent_id=agent_id)
     return {"context": summary}

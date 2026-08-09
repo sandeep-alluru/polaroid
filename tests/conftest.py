@@ -8,7 +8,7 @@ from polaroid.store import SceneStore
 @pytest.fixture
 def store(tmp_path):
     """Return a fresh SceneStore backed by a temp file."""
-    s = SceneStore(str(tmp_path / "scene.db"))
+    s = SceneStore(str(tmp_path / "scene.db"), data_root=tmp_path)
     yield s
     s.close()
 
@@ -16,6 +16,6 @@ def store(tmp_path):
 @pytest.fixture
 def store2(tmp_path):
     """Return a second fresh SceneStore for merge tests."""
-    s = SceneStore(str(tmp_path / "scene2.db"))
+    s = SceneStore(str(tmp_path / "scene2.db"), data_root=tmp_path)
     yield s
     s.close()
