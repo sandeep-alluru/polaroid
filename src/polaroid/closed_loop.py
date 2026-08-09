@@ -1,4 +1,4 @@
-"""Closed-loop scene gates for polaroid (DETACHED-PART / EMPTY-SCENE).
+"""Closed-loop scene gates for polaroid (DETACHED-PART / EMPTY-SCENE / LOS).
 
 Who reads the output?
   Embodied agents, navigation stacks, merge pipelines, eagle-eyes CI.
@@ -7,17 +7,20 @@ What outcome changes?
   Empty scene → FAIL_LOUD (cannot navigate a phantom map).
   Claimed attachment without spatial edge → FAIL (DETACHED-PART).
   Multi-room maps without connectivity edges → FAIL for navigation.
+  Observe/target claims without line-of-sight → FAIL (LINE-OF-SIGHT).
 
 Farm / Qdrant case (Roblox thrusters):
   Parts claimed as part of a body without weld/attachment → drift under physics.
   In the scene graph: object nodes without ``contains`` / ``on-top-of`` /
   ``attached-to`` edges are *detached* - gate refuses silent pass.
 
-Public map: PRIMAL3 pathfinding multi-agent spatial coordination (Track B).
+Public map: PRIMAL3 pathfinding multi-agent spatial coordination (Track B);
+  embodied agents that act on targets they cannot see (occlusion / LOS).
 """
 
 from __future__ import annotations
 
+from collections import defaultdict, deque
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
@@ -44,6 +47,33 @@ NAV_RELATIONS: frozenset[str] = frozenset(
         "connects",
         "connects-to",
         "leads-to",
+    }
+)
+
+# Relations that carry line-of-sight / visibility between entities or regions.
+LOS_RELATIONS: frozenset[str] = frozenset(
+    {
+        "sees",
+        "visible-to",
+        "visible_from",
+        "line-of-sight",
+        "line_of_sight",
+        "can-see",
+        "has-los",
+        "views",
+        "facing",
+    }
+)
+
+# Occluders that block LOS unless an explicit sees edge bypasses them.
+OCCLUSION_RELATIONS: frozenset[str] = frozenset(
+    {
+        "occludes",
+        "blocks-view",
+        "blocks_view",
+        "behind",
+        "hidden-by",
+        "hidden_by",
     }
 )
 
@@ -328,6 +358,175 @@ def assert_scene_ok(store: SceneStore, **kwargs: Any) -> GateOutcome:
 
 def assert_attached(store: SceneStore, part_id: str, parent_id: str) -> GateOutcome:
     outcome = gate_attachment(store, part_id, parent_id)
+    if not outcome.ok:
+        raise ClosedLoopError(f"{outcome.verdict}: {outcome.reason}")
+    return outcome
+
+
+def _los_edges(store: SceneStore) -> list[SceneEdge]:
+    return [
+        e
+        for e in store.list_edges()
+        if _norm_rel(e.relation) in {_norm_rel(r) for r in LOS_RELATIONS}
+        or _norm_rel(e.relation) in {_norm_rel(r) for r in NAV_RELATIONS}
+    ]
+
+
+def _occlusion_pairs(store: SceneStore) -> set[tuple[str, str]]:
+    """Pairs (occluder, target) or undirected block relationships."""
+    pairs: set[tuple[str, str]] = set()
+    for e in store.list_edges():
+        if _norm_rel(e.relation) in {_norm_rel(r) for r in OCCLUSION_RELATIONS}:
+            pairs.add((e.source_id, e.target_id))
+            pairs.add((e.target_id, e.source_id))
+    return pairs
+
+
+def has_line_of_sight(
+    store: SceneStore,
+    observer_id: str,
+    target_id: str,
+    *,
+    max_hops: int = 8,
+) -> bool:
+    """True if observer can reach target via LOS/nav edges without occlusion cut.
+
+    Rules (graph-level LOS, not full raycast):
+
+    * Direct ``sees`` / ``visible-to`` edge observer→target → True
+    * BFS on undirected LOS+nav edges up to ``max_hops``
+    * If an ``occludes`` edge names a node on the path as occluding the target,
+      that path is rejected (simple: any occluder adjacent to target blocks
+      unless a direct sees edge exists)
+    """
+    if observer_id == target_id:
+        return True
+    nodes = {n.id for n in store.list_nodes()}
+    if observer_id not in nodes or target_id not in nodes:
+        return False
+
+    # Direct visibility wins over occlusion
+    for e in store.list_edges():
+        rel = _norm_rel(e.relation)
+        if rel in {_norm_rel(r) for r in LOS_RELATIONS}:
+            if e.source_id == observer_id and e.target_id == target_id:
+                return True
+            if e.source_id == target_id and e.target_id == observer_id:
+                return True
+
+    occ = _occlusion_pairs(store)
+    # If target is occluded by something and no direct sees → may still walk
+    # around via rooms unless occluder sits on all paths (approx: block if
+    # occluder is neighbor of target and not the observer)
+    blocked_neighbors = {a for a, b in occ if b == target_id}
+
+    # Build adjacency from LOS + NAV
+    adj: dict[str, set[str]] = defaultdict(set)
+    for e in _los_edges(store):
+        adj[e.source_id].add(e.target_id)
+        adj[e.target_id].add(e.source_id)
+
+    if observer_id not in adj and target_id not in adj:
+        return False
+
+    q: deque[tuple[str, int]] = deque([(observer_id, 0)])
+    seen = {observer_id}
+    while q:
+        cur, dist = q.popleft()
+        if cur == target_id:
+            return True
+        if dist >= max_hops:
+            continue
+        for nxt in adj.get(cur, ()):
+            if nxt in seen:
+                continue
+            # do not step through known occluders of the target
+            if nxt in blocked_neighbors and nxt != target_id:
+                continue
+            seen.add(nxt)
+            q.append((nxt, dist + 1))
+    return False
+
+
+def gate_line_of_sight(
+    store: SceneStore,
+    observer_id: str,
+    target_id: str,
+    *,
+    action: str = "observe",
+    max_hops: int = 8,
+    require_nodes: bool = True,
+) -> GateOutcome:
+    """Refuse observe/target/interact when graph LOS is missing (LINE-OF-SIGHT).
+
+    Embodied agents often claim they can see or act on a target when walls /
+    occluders intervene. ``gate_navigable`` only checks room connectivity;
+    this gate checks **visibility path** observer→target.
+
+    Rules:
+
+    * Empty scene → **FAIL_LOUD**
+    * Missing observer/target nodes → **FAIL_LOUD**
+    * No LOS path → **FAIL**
+    * LOS present → **PASS**
+    """
+    n, e = store.node_count(), store.edge_count()
+    if n == 0:
+        return _fail_loud(
+            "LINE-OF-SIGHT: empty scene — cannot claim visibility on phantom map",
+            node_count=0,
+            edge_count=0,
+        )
+
+    obs = store.get_node(observer_id)
+    tgt = store.get_node(target_id)
+    if require_nodes and (obs is None or tgt is None):
+        missing = []
+        if obs is None:
+            missing.append("observer")
+        if tgt is None:
+            missing.append("target")
+        return _fail_loud(
+            f"LINE-OF-SIGHT: missing nodes {missing} for action={action!r} "
+            f"observer={observer_id[:8]}… target={target_id[:8]}…",
+            node_count=n,
+            edge_count=e,
+        )
+
+    if has_line_of_sight(store, observer_id, target_id, max_hops=max_hops):
+        olab = obs.label if obs else observer_id[:8]
+        tlab = tgt.label if tgt else target_id[:8]
+        return GateOutcome(
+            ok=True,
+            verdict="PASS",
+            reason=(
+                f"LINE-OF-SIGHT ok: {olab!r} → {tlab!r} action={action!r} "
+                f"hops<={max_hops}"
+            ),
+            exit_code=0,
+            node_count=n,
+            edge_count=e,
+        )
+
+    olab = obs.label if obs else observer_id[:8]
+    tlab = tgt.label if tgt else target_id[:8]
+    return _fail(
+        f"LINE-OF-SIGHT: no visibility path {olab!r} → {tlab!r} for "
+        f"action={action!r} — refuse observe/target through occlusion "
+        f"(walls/blocks-view without sees edge)",
+        node_count=n,
+        edge_count=e,
+    )
+
+
+def assert_line_of_sight(
+    store: SceneStore,
+    observer_id: str,
+    target_id: str,
+    **kwargs: Any,
+) -> GateOutcome:
+    """Raise :class:`ClosedLoopError` unless :func:`gate_line_of_sight` is ok."""
+    outcome = gate_line_of_sight(store, observer_id, target_id, **kwargs)
     if not outcome.ok:
         raise ClosedLoopError(f"{outcome.verdict}: {outcome.reason}")
     return outcome

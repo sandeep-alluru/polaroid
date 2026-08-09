@@ -5,13 +5,18 @@ from __future__ import annotations
 from importlib.metadata import version as _version
 
 from polaroid.closed_loop import (
+    LOS_RELATIONS,
+    OCCLUSION_RELATIONS,
     ClosedLoopError,
     GateOutcome,
     assert_attached,
+    assert_line_of_sight,
     assert_scene_ok,
     gate_attachment,
+    gate_line_of_sight,
     gate_navigable,
     gate_scene,
+    has_line_of_sight,
 )
 from polaroid.export import to_adjacency_matrix, to_dot, to_json
 from polaroid.graph import MergeResult, SceneEdge, SceneNode
@@ -27,7 +32,9 @@ __all__ = [
     "ClosedLoopError",
     "GateOutcome",
     "GraphStats",
+    "LOS_RELATIONS",
     "MergeResult",
+    "OCCLUSION_RELATIONS",
     "SceneEdge",
     "SceneMerger",
     "SceneNode",
@@ -35,14 +42,17 @@ __all__ = [
     "SceneStore",
     "__version__",
     "assert_attached",
+    "assert_line_of_sight",
     "assert_scene_ok",
     "cluster_by_type",
     "compute_stats",
     "extract_subgraph",
     "filter_by_type",
     "gate_attachment",
+    "gate_line_of_sight",
     "gate_navigable",
     "gate_scene",
+    "has_line_of_sight",
     "most_connected",
     "neighborhood",
     "to_adjacency_matrix",

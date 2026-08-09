@@ -61,7 +61,44 @@ could open or create files outside the intended data directory
 
 ---
 
+## Case LINE-OF-SIGHT — observe/target without visibility path
+
+**Source:** Track B embodied / computer-use spatial failures (PRIMAL3 pathfinding
+class + CUA agents that click/observe through walls). Twin of `gate_navigable`
+(room connectivity) for **visibility**.
+
+**What fails:**
+
+1. Agents claim they can **see** or **click** a target when no `sees` /
+   visibility path exists in the scene graph.
+2. Occluders (`occludes`, `blocks-view`) sit on the only path to the target.
+3. Navigation connectivity alone is treated as LOS.
+
+**Product in this repo:**
+
+| Control | API |
+|---------|-----|
+| LOS relations | `LOS_RELATIONS` / `OCCLUSION_RELATIONS` |
+| Predicate | `has_line_of_sight(store, observer, target)` |
+| Gate | `gate_line_of_sight(...)` |
+| Raise form | `assert_line_of_sight` |
+
+**Rules (load-bearing):**
+
+- Empty scene / missing nodes → **FAIL_LOUD**
+- No LOS path (sees/nav BFS, occluders cut) → **FAIL**
+- Direct `sees` or clear path → **PASS**
+
+**Tests:** `tests/test_line_of_sight.py`
+
+**Non-Ornament:** Call `gate_line_of_sight` before observe/target/click on
+embodied or GUI-mapped scene graphs. Pair with `gate_navigable` and
+`clickproof.gate_click_attempt`.
+
+---
+
 ## Related IDs
 
 - **DETACHED-PART** / **EMPTY-SCENE** — this case
+- **LINE-OF-SIGHT** — visibility path (this section)
 - agentcrdt CONST-AS-STATE — refuse wrong class of state (sibling discipline)
