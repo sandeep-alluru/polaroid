@@ -51,7 +51,7 @@ class SceneStore:
     # ── Nodes ──────────────────────────────────────────────────────────────────
 
     def upsert_node(self, node: SceneNode) -> None:
-        """Insert or update node — only overwrites if incoming confidence >= existing."""
+        """Insert or update node - only overwrites if incoming confidence >= existing."""
         existing = self.get_node(node.id)
         if existing is None:
             self._conn.execute(
@@ -121,7 +121,7 @@ class SceneStore:
     # ── Edges ──────────────────────────────────────────────────────────────────
 
     def upsert_edge(self, edge: SceneEdge) -> None:
-        """Insert or update edge — only overwrites if incoming confidence >= existing."""
+        """Insert or update edge - only overwrites if incoming confidence >= existing."""
         existing = self.get_edge(edge.id)
         if existing is None:
             self._conn.execute(

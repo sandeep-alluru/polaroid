@@ -1,4 +1,4 @@
-"""polaroid — Embeddable CRDT scene graph for embodied AI agents."""
+"""polaroid - Embeddable CRDT scene graph for embodied AI agents."""
 
 from __future__ import annotations
 

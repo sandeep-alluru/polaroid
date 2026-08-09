@@ -1,4 +1,4 @@
-"""DETACHED-PART / EMPTY-SCENE — spatial graph must refuse phantom maps.
+"""DETACHED-PART / EMPTY-SCENE - spatial graph must refuse phantom maps.
 
 Farm Qdrant: Roblox thrusters not welded → parts drift.
 Public: PRIMAL3 pathfinding needs connected spatial structure.
@@ -37,7 +37,7 @@ def test_detached_part_fails(store: SceneStore) -> None:
     )
     store.upsert_node(body)
     store.upsert_node(thruster)
-    # no weld edge — DETACHED-PART
+    # no weld edge - DETACHED-PART
     out = gate_scene(store)
     assert out.ok is False
     assert out.verdict == "FAIL"
@@ -54,9 +54,7 @@ def test_welded_part_passes(store: SceneStore) -> None:
     )
     store.upsert_node(body)
     store.upsert_node(thruster)
-    store.upsert_edge(
-        SceneEdge(source_id=body.id, target_id=thruster.id, relation="contains")
-    )
+    store.upsert_edge(SceneEdge(source_id=body.id, target_id=thruster.id, relation="contains"))
     out = gate_scene(store)
     assert out.ok is True
     assert out.verdict == "PASS"
@@ -71,9 +69,7 @@ def test_gate_attachment_specific(store: SceneStore) -> None:
     out = gate_attachment(store, wing.id, body.id)
     assert out.ok is False
     assert "DETACHED-PART" in out.reason
-    store.upsert_edge(
-        SceneEdge(source_id=wing.id, target_id=body.id, relation="welded-to")
-    )
+    store.upsert_edge(SceneEdge(source_id=wing.id, target_id=body.id, relation="welded-to"))
     out2 = gate_attachment(store, wing.id, body.id)
     assert out2.ok is True
 
@@ -94,9 +90,7 @@ def test_navigable_connected_rooms_pass(store: SceneStore) -> None:
     b = SceneNode(label="room-b", node_type="room", properties={})
     store.upsert_node(a)
     store.upsert_node(b)
-    store.upsert_edge(
-        SceneEdge(source_id=a.id, target_id=b.id, relation="adjacent-to")
-    )
+    store.upsert_edge(SceneEdge(source_id=a.id, target_id=b.id, relation="adjacent-to"))
     out = gate_navigable(store, min_rooms=2)
     assert out.ok is True
     assert out.verdict == "PASS"

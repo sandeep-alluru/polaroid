@@ -33,12 +33,6 @@ import tempfile
 import time
 from pathlib import Path
 
-# polaroid
-from polaroid.graph import SceneEdge, SceneNode
-from polaroid.merger import SceneMerger
-from polaroid.query import SceneQuery
-from polaroid.store import SceneStore
-
 # agentcrdt
 from agentcrdt.fact import WorldFact
 from agentcrdt.merger import WorldMerger
@@ -49,6 +43,11 @@ from agentcrdt.store import WorldStore
 from groundcrew.codec import ActionSpec
 from groundcrew.oracle import Oracle, ReceiptStore
 
+# polaroid
+from polaroid.graph import SceneEdge, SceneNode
+from polaroid.merger import SceneMerger
+from polaroid.query import SceneQuery
+from polaroid.store import SceneStore
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -207,7 +207,7 @@ while queue:
     for neighbor in adj.get(current, []):
         if neighbor not in visited:
             visited.add(neighbor)
-            queue.append(path + [neighbor])
+            queue.append([*path, neighbor])
 
 # Resolve IDs → labels
 def label_of(node_id: str) -> str:

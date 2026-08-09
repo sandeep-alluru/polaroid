@@ -11,15 +11,16 @@ What outcome changes?
 Farm / Qdrant case (Roblox thrusters):
   Parts claimed as part of a body without weld/attachment → drift under physics.
   In the scene graph: object nodes without ``contains`` / ``on-top-of`` /
-  ``attached-to`` edges are *detached* — gate refuses silent pass.
+  ``attached-to`` edges are *detached* - gate refuses silent pass.
 
 Public map: PRIMAL3 pathfinding multi-agent spatial coordination (Track B).
 """
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
 from polaroid.graph import SceneEdge, SceneNode
 from polaroid.store import SceneStore
@@ -194,7 +195,7 @@ def gate_scene(
     e = store.edge_count()
     if n < min_nodes:
         return _fail_loud(
-            f"empty scene graph — {n} nodes (<{min_nodes}); "
+            f"empty scene graph - {n} nodes (<{min_nodes}); "
             f"cannot navigate or merge a phantom map (EMPTY-SCENE)",
             node_count=n,
             edge_count=e,
@@ -206,7 +207,7 @@ def gate_scene(
             labels = [d.label for d in det[:5]]
             return _fail(
                 f"DETACHED-PART: {len(det)} node(s) without attachment edges "
-                f"(e.g. {labels}) — refuse silent weld (Roblox thruster class)",
+                f"(e.g. {labels}) - refuse silent weld (Roblox thruster class)",
                 node_count=n,
                 edge_count=e,
                 detached_count=len(det),
@@ -251,7 +252,7 @@ def gate_attachment(
         )
     return _fail(
         f"DETACHED-PART: {part.label!r} ({part_id[:8]}…) has no attachment edge "
-        f"to {parent.label!r} — thruster/body weld missing",
+        f"to {parent.label!r} - thruster/body weld missing",
         node_count=n,
         edge_count=e,
         detached_count=1,
@@ -265,15 +266,15 @@ def gate_navigable(
 ) -> GateOutcome:
     """Gate multi-room navigation: rooms need adjacent/connects edges.
 
-    PRIMAL3 / multi-agent pathfinding class — disconnected rooms are not a map.
+    PRIMAL3 / multi-agent pathfinding class - disconnected rooms are not a map.
     """
     nodes = store.list_nodes()
     rooms = [n for n in nodes if n.node_type.lower() in {"room", "region", "area"}]
     n, e = len(nodes), store.edge_count()
     if len(rooms) < min_rooms:
-        # Not a multi-room map — pass navigable check (single space)
+        # Not a multi-room map - pass navigable check (single space)
         if store.node_count() == 0:
-            return _fail_loud("empty scene — not navigable", node_count=0, edge_count=0)
+            return _fail_loud("empty scene - not navigable", node_count=0, edge_count=0)
         return GateOutcome(
             ok=True,
             verdict="PASS",
@@ -287,7 +288,7 @@ def gate_navigable(
     if not nav:
         return _fail(
             f"EMPTY-SCENE connectivity: {len(rooms)} rooms but 0 nav edges "
-            f"(adjacent-to/connects) — pathfinding impossible",
+            f"(adjacent-to/connects) - pathfinding impossible",
             node_count=n,
             edge_count=e,
             orphan_room_count=len(rooms),

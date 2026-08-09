@@ -54,7 +54,7 @@ class SceneMerger:
                 updated_nodes.append(remote_node)
                 conflicts_resolved += 1
 
-            # else: local has higher or equal confidence — keep local, no action
+            # else: local has higher or equal confidence - keep local, no action
 
         # ── Edges ──────────────────────────────────────────────────────────────
         for remote_edge in remote.list_edges():

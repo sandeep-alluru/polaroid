@@ -37,7 +37,7 @@ def print_scene(
 
     con.print(
         Panel(
-            f"[bold cyan]Scene Graph — {len(nodes)} node(s)[/bold cyan]",
+            f"[bold cyan]Scene Graph - {len(nodes)} node(s)[/bold cyan]",
             expand=False,
             border_style="cyan",
         )

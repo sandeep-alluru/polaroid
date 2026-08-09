@@ -9,7 +9,7 @@ from polaroid.store import SceneStore
 class SceneQuery:
     """High-level query interface for a SceneStore.
 
-    All methods are read-only — they never modify the store.
+    All methods are read-only - they never modify the store.
     """
 
     def __init__(self, store: SceneStore) -> None:
@@ -84,7 +84,7 @@ class SceneQuery:
             type_parts.append(f"{c} {t}{'s' if c != 1 else ''}")
 
         if not type_parts:
-            return "Empty scene graph — no nodes observed."
+            return "Empty scene graph - no nodes observed."
 
         header = ", ".join(type_parts) + "."
 

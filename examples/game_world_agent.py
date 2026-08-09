@@ -133,7 +133,7 @@ while queue:
     for neighbor in query.find_neighbors(current, relation="connects_to"):
         if neighbor.id not in visited:
             visited.add(neighbor.id)
-            queue.append(path + [neighbor.id])
+            queue.append([*path, neighbor.id])
 
 if path_ids:
     labels = []
