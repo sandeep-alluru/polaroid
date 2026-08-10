@@ -34,9 +34,7 @@ def test_direct_sees_passes(store: SceneStore) -> None:
     target = SceneNode(label="button", node_type="object", properties={})
     store.upsert_node(agent)
     store.upsert_node(target)
-    store.upsert_edge(
-        SceneEdge(source_id=agent.id, target_id=target.id, relation="sees")
-    )
+    store.upsert_edge(SceneEdge(source_id=agent.id, target_id=target.id, relation="sees"))
     out = gate_line_of_sight(store, agent.id, target.id, action="click")
     assert out.ok is True
     assert out.verdict == "PASS"
@@ -63,15 +61,9 @@ def test_occluder_blocks_nav_path(store: SceneStore) -> None:
     store.upsert_node(wall)
     store.upsert_node(target)
     # path agent-wall-target via adjacent but wall occludes gem
-    store.upsert_edge(
-        SceneEdge(source_id=agent.id, target_id=wall.id, relation="adjacent-to")
-    )
-    store.upsert_edge(
-        SceneEdge(source_id=wall.id, target_id=target.id, relation="adjacent-to")
-    )
-    store.upsert_edge(
-        SceneEdge(source_id=wall.id, target_id=target.id, relation="occludes")
-    )
+    store.upsert_edge(SceneEdge(source_id=agent.id, target_id=wall.id, relation="adjacent-to"))
+    store.upsert_edge(SceneEdge(source_id=wall.id, target_id=target.id, relation="adjacent-to"))
+    store.upsert_edge(SceneEdge(source_id=wall.id, target_id=target.id, relation="occludes"))
     out = gate_line_of_sight(store, agent.id, target.id)
     assert out.ok is False
     assert out.verdict == "FAIL"
@@ -86,15 +78,9 @@ def test_room_chain_los_passes(store: SceneStore) -> None:
     store.upsert_node(room_a)
     store.upsert_node(room_b)
     store.upsert_node(target)
-    store.upsert_edge(
-        SceneEdge(source_id=agent.id, target_id=room_a.id, relation="adjacent-to")
-    )
-    store.upsert_edge(
-        SceneEdge(source_id=room_a.id, target_id=room_b.id, relation="connects")
-    )
-    store.upsert_edge(
-        SceneEdge(source_id=room_b.id, target_id=target.id, relation="adjacent-to")
-    )
+    store.upsert_edge(SceneEdge(source_id=agent.id, target_id=room_a.id, relation="adjacent-to"))
+    store.upsert_edge(SceneEdge(source_id=room_a.id, target_id=room_b.id, relation="connects"))
+    store.upsert_edge(SceneEdge(source_id=room_b.id, target_id=target.id, relation="adjacent-to"))
     out = gate_line_of_sight(store, agent.id, target.id, action="inspect")
     assert out.ok is True
 
@@ -116,17 +102,11 @@ def test_embodied_los_fixture(store: SceneStore) -> None:
     store.upsert_node(bot)
     store.upsert_node(door)
     store.upsert_node(btn)
-    store.upsert_edge(
-        SceneEdge(source_id=bot.id, target_id=door.id, relation="adjacent-to")
-    )
-    store.upsert_edge(
-        SceneEdge(source_id=door.id, target_id=btn.id, relation="occludes")
-    )
+    store.upsert_edge(SceneEdge(source_id=bot.id, target_id=door.id, relation="adjacent-to"))
+    store.upsert_edge(SceneEdge(source_id=door.id, target_id=btn.id, relation="occludes"))
     refuse = gate_line_of_sight(store, bot.id, btn.id, action="click")
     assert refuse.ok is False
 
-    store.upsert_edge(
-        SceneEdge(source_id=bot.id, target_id=btn.id, relation="sees")
-    )
+    store.upsert_edge(SceneEdge(source_id=bot.id, target_id=btn.id, relation="sees"))
     ok = gate_line_of_sight(store, bot.id, btn.id, action="click")
     assert ok.ok is True

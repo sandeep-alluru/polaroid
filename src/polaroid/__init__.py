@@ -29,12 +29,12 @@ from polaroid.subgraph import extract_subgraph, filter_by_type, neighborhood
 __version__ = _version("polaroid-ai")
 
 __all__ = [
+    "LOS_RELATIONS",
+    "OCCLUSION_RELATIONS",
     "ClosedLoopError",
     "GateOutcome",
     "GraphStats",
-    "LOS_RELATIONS",
     "MergeResult",
-    "OCCLUSION_RELATIONS",
     "SceneEdge",
     "SceneMerger",
     "SceneNode",

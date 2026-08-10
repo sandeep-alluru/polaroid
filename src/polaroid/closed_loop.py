@@ -499,10 +499,7 @@ def gate_line_of_sight(
         return GateOutcome(
             ok=True,
             verdict="PASS",
-            reason=(
-                f"LINE-OF-SIGHT ok: {olab!r} → {tlab!r} action={action!r} "
-                f"hops<={max_hops}"
-            ),
+            reason=(f"LINE-OF-SIGHT ok: {olab!r} → {tlab!r} action={action!r} hops<={max_hops}"),
             exit_code=0,
             node_count=n,
             edge_count=e,
