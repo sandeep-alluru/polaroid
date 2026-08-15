@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import json
-import os
 import sqlite3
 from pathlib import Path
 from typing import Any
 
 from polaroid.graph import SceneEdge, SceneNode
-from polaroid.paths import MEMORY_URI, safe_db_path
+from polaroid.paths import MEMORY_URI, connect_sqlite, ensure_parent_dir, resolve_store_path
 
 
 class SceneStore:
@@ -34,17 +33,14 @@ class SceneStore:
             Optional root directory (defaults to env ``POLAROID_DATA_DIR`` or
             ``.polaroid``). Tests should pass the pytest ``tmp_path``.
         """
-        resolved = safe_db_path(path, root=data_root)
-        if resolved == MEMORY_URI:
+        full, base = resolve_store_path(path, root=data_root, default_name="scene.db")
+        if full == MEMORY_URI:
             self._path = Path(MEMORY_URI)
-            self._conn = sqlite3.connect(MEMORY_URI)
+            self._conn = connect_sqlite(MEMORY_URI, None)
         else:
-            # resolved is realpath-confined (safe for sqlite / mkdir)
-            parent = os.path.dirname(resolved)
-            if parent:
-                os.makedirs(parent, exist_ok=True)
-            self._path = Path(resolved)
-            self._conn = sqlite3.connect(resolved)
+            ensure_parent_dir(full, base)
+            self._path = Path(full)
+            self._conn = connect_sqlite(full, base)
         self._conn.row_factory = sqlite3.Row
         self._create_schema()
 
