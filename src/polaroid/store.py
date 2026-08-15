@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from pathlib import Path
 from typing import Any
@@ -38,9 +39,12 @@ class SceneStore:
             self._path = Path(MEMORY_URI)
             self._conn = sqlite3.connect(MEMORY_URI)
         else:
+            # resolved is realpath-confined (safe for sqlite / mkdir)
+            parent = os.path.dirname(resolved)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
             self._path = Path(resolved)
-            self._path.parent.mkdir(parents=True, exist_ok=True)
-            self._conn = sqlite3.connect(str(self._path))
+            self._conn = sqlite3.connect(resolved)
         self._conn.row_factory = sqlite3.Row
         self._create_schema()
 

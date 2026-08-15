@@ -11,14 +11,13 @@ from polaroid.store import SceneStore
 
 
 def test_safe_db_path_relative_under_root(tmp_path: Path) -> None:
-    full = safe_db_path("scene.db", root=tmp_path)
-    assert isinstance(full, Path)
+    full = Path(safe_db_path("scene.db", root=tmp_path))
     assert full == (tmp_path / "scene.db").resolve()
     assert full.relative_to(tmp_path.resolve())
 
 
 def test_safe_db_path_strips_legacy_polaroid_prefix(tmp_path: Path) -> None:
-    full = safe_db_path(".polaroid/scene.db", root=tmp_path)
+    full = Path(safe_db_path(".polaroid/scene.db", root=tmp_path))
     assert full == (tmp_path / "scene.db").resolve()
 
 
@@ -34,7 +33,8 @@ def test_safe_db_path_rejects_absolute_outside_root(tmp_path: Path) -> None:
 
 def test_safe_db_path_allows_absolute_inside_root(tmp_path: Path) -> None:
     target = (tmp_path / "nested" / "s.db").resolve()
-    full = safe_db_path(str(target), root=tmp_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    full = Path(safe_db_path(str(target), root=tmp_path))
     assert full == target
 
 
