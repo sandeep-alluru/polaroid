@@ -45,10 +45,7 @@ def test_path_injection_rejected(client, db, monkeypatch, tmp_path):
     )
     assert r.status_code == 400
     detail = str(r.json().get("detail", ""))
-    assert any(
-        x in detail.lower()
-        for x in ("escapes", "data root", "..", "path", "must not")
-    )
+    assert any(x in detail.lower() for x in ("escapes", "data root", "..", "path", "must not"))
 
 
 def test_health_returns_version(client):
