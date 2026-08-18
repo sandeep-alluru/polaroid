@@ -48,7 +48,9 @@ def run_server() -> None:
         return [
             _mcp_types.Tool(
                 name="add_scene_node",
-                description="Add or update a node in the polaroid scene graph.",
+                description=(
+                    "Store a UI screenshot as a semantic scene node in polaroid visual memory. Use when a computer-use agent observes a screen it may need to recall later by intent. Do not use for textual facts alone — use query_nodes / get_context to retrieve."
+                ),
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -64,7 +66,9 @@ def run_server() -> None:
             ),
             _mcp_types.Tool(
                 name="query_nodes",
-                description="Query scene graph nodes by type, label, or confidence.",
+                description=(
+                    "Query scene nodes by intent/semantic similarity. Use when the agent needs prior screens relevant to a goal. Prefer get_context for a ready-to-inject summary."
+                ),
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -77,7 +81,9 @@ def run_server() -> None:
             ),
             _mcp_types.Tool(
                 name="get_context",
-                description="Get a text summary of the current scene graph.",
+                description=(
+                    "Build a compact visual-memory context string for the current intent. Use at turn start to remind the agent of relevant past screens. Use query_nodes for structured node lists."
+                ),
                 inputSchema={
                     "type": "object",
                     "properties": {
