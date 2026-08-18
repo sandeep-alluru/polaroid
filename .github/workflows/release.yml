@@ -11,10 +11,21 @@ permissions:
 
 jobs:
   ci-gate:
-    uses: ./.github/workflows/ci.yml
+    name: CI gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src/ tests/
+      - run: ruff format --check src/ tests/
+      - run: mypy src/polaroid/ --ignore-missing-imports
+      - run: pytest tests/ -v --tb=short
 
   build:
-    needs: ci-gate
+    needs: [ci-gate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -31,7 +42,6 @@ jobs:
   publish-pypi:
     needs: build
     runs-on: ubuntu-latest
-    environment: pypi
     steps:
       - uses: actions/download-artifact@v8
         with:
